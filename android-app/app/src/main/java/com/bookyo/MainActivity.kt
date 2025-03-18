@@ -15,7 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.bookyo.components.BookyoTextField
 import com.bookyo.ui.BookyoTheme
-import com.bookyo.ui.components.BookyoButton
+import com.bookyo.components.BookyoButton
 
 class MainActivity: ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

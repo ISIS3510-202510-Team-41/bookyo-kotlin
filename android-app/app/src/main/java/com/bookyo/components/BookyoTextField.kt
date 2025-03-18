@@ -11,7 +11,6 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
@@ -39,7 +38,9 @@ fun BookyoTextField(
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
     isError: Boolean = false,
-    errorMessage: String? = null
+    errorMessage: String? = null,
+    leadingIcon: @Composable (() -> Unit)? = null,
+    trailingIcon: @Composable (() -> Unit)? = null
 ) {
     TextField(
         value = value,
@@ -65,6 +66,8 @@ fun BookyoTextField(
         supportingText = if (isError && !errorMessage.isNullOrEmpty()) {
             { Text(text = errorMessage) }
         } else null,
-        singleLine = true
+        singleLine = true,
+        leadingIcon = leadingIcon,
+        trailingIcon = trailingIcon
     )
 }
