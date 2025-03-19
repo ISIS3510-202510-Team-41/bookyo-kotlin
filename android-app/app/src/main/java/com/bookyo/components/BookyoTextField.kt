@@ -57,7 +57,7 @@ fun BookyoTextField(
             disabledContainerColor = MaterialTheme.colorScheme.outline,
             cursorColor = MaterialTheme.colorScheme.onSurface,
             focusedTextColor = MaterialTheme.colorScheme.onSurface,
-            unfocusedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
+            unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
         ),
         visualTransformation = if (isPassword) PasswordVisualTransformation() else VisualTransformation.None,
         keyboardOptions = keyboardOptions,

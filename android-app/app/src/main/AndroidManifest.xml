@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <application
+        android:name="com.bookyo.BooykoApp"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -23,6 +24,31 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- Login Activity -->
+        <activity
+            android:name="com.bookyo.auth.login.LoginActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Bookyo"
+            android:windowSoftInputMode="adjustResize"
+            android:label="Login"/>
+
+        <!-- Sign Up Activity -->
+        <activity
+            android:name="com.bookyo.auth.signup.SignUpActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Bookyo"
+            android:windowSoftInputMode="adjustResize"
+            android:label="Sign Up"/>
+
+
+        <activity
+            android:name="com.bookyo.home.HomeScreenActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Bookyo"
+            android:label="Home"
+            />
+
     </application>
 
 </manifest>

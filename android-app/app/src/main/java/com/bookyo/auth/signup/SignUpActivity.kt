@@ -1,6 +1,7 @@
 package com.bookyo.auth.signup
 
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -28,11 +29,15 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.bookyo.R
 import com.bookyo.auth.AuthBaseActivity
 import com.bookyo.components.BookyoButton
 import com.bookyo.components.BookyoTextField
+import com.bookyo.components.ToastHandler
+import com.bookyo.components.ToastState
+import com.bookyo.components.rememberToastState
+import com.bookyo.home.HomeScreenActivity
 import com.bookyo.ui.BookyoTheme
-import com.example.bookyo.R
 
 class SignUpActivity: AuthBaseActivity() {
     private val viewModel: SignUpViewModel by viewModels()
@@ -43,7 +48,13 @@ class SignUpActivity: AuthBaseActivity() {
 
     override fun showAuthFlow() {
         setContent {
-            SignUpFlow(viewModel, {/*intent*/})
+            SignUpFlow(viewModel = viewModel, {
+                val intent = Intent(this, HomeScreenActivity::class.java).apply {
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                }
+                startActivity(intent)
+                finish()
+            })
         }
     }
 
@@ -53,7 +64,8 @@ class SignUpActivity: AuthBaseActivity() {
         viewModel: SignUpViewModel, onSignUpSuccess: () -> Unit
     ) {
         BookyoTheme {
-            SignUpScreen(viewModel = viewModel, onSignUpSuccess = onSignUpSuccess )
+
+            SignUpScreen(viewModel = viewModel, onSignUpSuccess = onSignUpSuccess)
         }
     }
 
@@ -63,6 +75,8 @@ class SignUpActivity: AuthBaseActivity() {
         viewModel: SignUpViewModel, onSignUpSuccess: () -> Unit
     ) {
         val scrollState = rememberScrollState()
+        val toastState = rememberToastState()
+
 
         Column(
             modifier = Modifier
@@ -76,8 +90,8 @@ class SignUpActivity: AuthBaseActivity() {
             )
 
             when (viewModel.currentState) {
-                SignUpState.WaitingForConfirmation -> ConfirmationForm(viewModel, onSignUpSuccess)
-                else -> SignUpForm(viewModel, modifier = Modifier.verticalScroll(scrollState))
+                SignUpState.WaitingForConfirmation -> ConfirmationForm(viewModel, onSignUpSuccess, toastState)
+                else -> SignUpForm(viewModel, modifier = Modifier.verticalScroll(scrollState), toastState)
             }
         }
     }
@@ -91,13 +105,13 @@ class SignUpActivity: AuthBaseActivity() {
                 text = when (state) {
                     SignUpState.WaitingForConfirmation -> "Confirm Your Email"
                     else -> "Create Your Account"
-                }, style = MaterialTheme.typography.displayMedium
+                }, style = MaterialTheme.typography.displayLarge
             )
         }
     }
 
     @Composable
-    fun SignUpForm(viewModel: SignUpViewModel, modifier: Modifier) {
+    fun SignUpForm(viewModel: SignUpViewModel, modifier: Modifier, toastState: ToastState) {
         val showPassword = remember { mutableStateOf(false) }
 
         Column(
@@ -192,14 +206,12 @@ class SignUpActivity: AuthBaseActivity() {
                     }
                 })
 
-            // Error message
+            // Error message for confirmation
             when (viewModel.currentState) {
                 is SignUpState.Error -> {
-                    Text(
-                        text = (viewModel.currentState as SignUpState.Error).message,
-                        color = MaterialTheme.colorScheme.onError,
-                        modifier = Modifier.padding(vertical = 8.dp)
-                    )
+                    toastState.showError((viewModel.currentState as SignUpState.Error).message)
+                    ToastHandler(toastState)
+                    viewModel.currentState = SignUpState.Initial
                 }
 
                 else -> {}
@@ -216,7 +228,7 @@ class SignUpActivity: AuthBaseActivity() {
     }
 
     @Composable
-    fun ConfirmationForm(viewModel: SignUpViewModel, onConfirmationSuccess: () -> Unit) {
+    fun ConfirmationForm(viewModel: SignUpViewModel, onConfirmationSuccess: () -> Unit, toastState: ToastState) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -249,10 +261,9 @@ class SignUpActivity: AuthBaseActivity() {
             // Error message for confirmation
             when (viewModel.currentState) {
                 is SignUpState.Error -> {
-                    Text(
-                        text = (viewModel.currentState as SignUpState.Error).message,
-                        modifier = Modifier.padding(vertical = 8.dp)
-                    )
+                    toastState.showError((viewModel.currentState as SignUpState.Error).message)
+                    ToastHandler(toastState)
+                    viewModel.currentState = SignUpState.Initial
                 }
 
                 else -> {}

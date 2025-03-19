@@ -8,7 +8,6 @@ import com.amplifyframework.kotlin.core.Amplify
 import com.amplifyframework.api.aws.AWSApiPlugin
 import com.amplifyframework.auth.cognito.AWSCognitoAuthPlugin
 
-import com.example.bookyo.R
 
 class BooykoApp: Application() {
     override fun onCreate() {
