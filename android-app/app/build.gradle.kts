@@ -64,8 +64,8 @@ dependencies {
 
     implementation ("com.google.accompanist:accompanist-permissions:0.32.0")
     implementation("androidx.compose.ui:ui-text-google-fonts:1.5.4")
-
-
+    implementation("androidx.compose.material3:material3:1.2.0")
+    implementation("androidx.compose.material:material:1.5.0")
 
     // Amplify dependency
     implementation("com.amplifyframework:core-kotlin:2.24.0")
