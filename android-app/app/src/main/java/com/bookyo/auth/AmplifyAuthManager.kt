@@ -17,6 +17,7 @@ import com.amplifyframework.auth.exceptions.NotAuthorizedException
 import com.amplifyframework.auth.exceptions.ServiceException
 import com.amplifyframework.auth.options.AuthSignUpOptions
 import com.amplifyframework.kotlin.core.Amplify
+import com.bookyo.analytics.BookyoAnalytics
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
@@ -55,6 +56,8 @@ class AmplifyAuthManager {
         Log.d(TAG, "$AUTH_CONFIRM: Attempting to confirm signup for email: ${email.masked()}")
 
         Amplify.Auth.confirmSignUp(email, confirmationCode)
+
+        BookyoAnalytics.recordAppEvent(eventName = "_userauth.sign_up")
 
         Log.i(TAG, "$AUTH_CONFIRM: Successfully confirmed signup for email: ${email.masked()}")
         true
@@ -111,6 +114,8 @@ class AmplifyAuthManager {
 
         Amplify.Auth.signIn(email, password)
         val currentUser = Amplify.Auth.getCurrentUser()
+        BookyoAnalytics.recordAppEvent(eventName = "_userauth.sign_in")
+
         Log.i(TAG, "$AUTH_SIGNIN: Successfully signed in user: ${email.masked()}")
         currentUser
     }.onFailure { exception ->
@@ -256,6 +261,8 @@ class AmplifyAuthManager {
         email: String,
         exception: Throwable
     ) {
+        BookyoAnalytics.recordAppEvent(eventName = "_userauth.auth_fail")
+
         when (exception) {
             is AuthException -> {
                 when (exception.cause) {

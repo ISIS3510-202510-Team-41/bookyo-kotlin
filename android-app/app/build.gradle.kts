@@ -72,6 +72,8 @@ dependencies {
 
     implementation("com.amplifyframework:aws-api:2.24.0")
     implementation("com.amplifyframework:aws-auth-cognito:2.24.0")
+    implementation("com.amplifyframework:aws-analytics-pinpoint:2.24.0")
+
 
 
     implementation("com.amplifyframework:core:2.24.0")
