@@ -40,7 +40,7 @@ fun BookyoButton(
         contentPadding = PaddingValues(horizontal = 16.dp, vertical = 14.dp),
         colors = ButtonDefaults.buttonColors(
             containerColor = if (isError) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary,
-            contentColor = (if (isError) MaterialTheme.colorScheme.onError else MaterialTheme.colorScheme.onSurface),
+            contentColor = (if (isError) MaterialTheme.colorScheme.onError else MaterialTheme.colorScheme.onPrimary),
             disabledContainerColor = (if (isError) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary).copy(alpha = 0.5f),
             disabledContentColor = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.5f)
         ),
