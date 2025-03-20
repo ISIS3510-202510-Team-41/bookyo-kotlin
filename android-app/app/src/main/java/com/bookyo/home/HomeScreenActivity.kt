@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.*
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.foundation.background
 import androidx.compose.runtime.Composable
 import com.bookyo.ui.BookyoTheme
@@ -21,24 +22,28 @@ import com.bookyo.components.BookyoButton
 import com.bookyo.components.BottomNavigationBar
 import com.bookyo.ui.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.livedata.observeAsState
 
 class HomeScreenActivity: ComponentActivity() {
+
+    private val viewModel: HomeViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContent {
             BookyoTheme {
-                HomeScreen()
+                HomeScreen(viewModel)
             }
         }
     }
 }
 
 @Composable
-fun HomeScreen(viewModel: HomeViewModel = androidx.lifecycle.viewmodel.compose.viewModel()) {
-    val books by viewModel.books.observeAsState(emptyList())
-    var selectedItem by remember { mutableStateOf(0) }
+fun HomeScreen(viewModel: HomeViewModel) {
+
+    // Hacer collect de la entidad como estado
+    val books by viewModel.books.collectAsState()
+    var selectedItem by remember { mutableIntStateOf(0) }
 
     Column(
         modifier = Modifier
@@ -124,16 +129,5 @@ fun HomeScreen(viewModel: HomeViewModel = androidx.lifecycle.viewmodel.compose.v
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun HomeScreenPreview() {
-    BookyoTheme {
-        Surface(
-            modifier = Modifier.fillMaxSize(),
-            color = MaterialTheme.colorScheme.background
-        ) {
-            HomeScreen()
-        }
-    }
-}
+
 
