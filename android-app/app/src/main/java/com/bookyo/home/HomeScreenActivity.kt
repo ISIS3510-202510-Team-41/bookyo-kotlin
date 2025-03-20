@@ -21,8 +21,7 @@ import com.bookyo.components.BookyoButton
 import com.bookyo.components.BottomNavigationBar
 import com.bookyo.ui.*
 import androidx.compose.runtime.*
-
-
+import androidx.compose.runtime.livedata.observeAsState
 
 class HomeScreenActivity: ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -37,7 +36,8 @@ class HomeScreenActivity: ComponentActivity() {
 }
 
 @Composable
-fun HomeScreen() {
+fun HomeScreen(viewModel: HomeViewModel = androidx.lifecycle.viewmodel.compose.viewModel()) {
+    val books by viewModel.books.observeAsState(emptyList())
     var selectedItem by remember { mutableStateOf(0) }
 
     Column(
@@ -77,7 +77,17 @@ fun HomeScreen() {
                     modifier = Modifier
                         .size(300.dp, 170.dp)
                         .background(whiteGray)
-                )
+                ) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        books.forEach { book ->
+                            Text(
+                                text = book.title,
+                                style = typography.displaySmall,
+                                modifier = Modifier.padding(4.dp)
+                            )
+                        }
+                    }
+                }
                 Spacer(modifier = Modifier.height(8.dp))
                 BookyoButton(
                     onClick = { /* Acción para explorar libros */ },
