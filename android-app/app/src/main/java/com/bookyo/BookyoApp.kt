@@ -13,7 +13,7 @@ import com.amplifyframework.core.Amplify as JavaAmplify
 
 
 
-class BooykoApp: Application() {
+class BookyoApp: Application() {
     override fun onCreate() {
         super.onCreate()
 
