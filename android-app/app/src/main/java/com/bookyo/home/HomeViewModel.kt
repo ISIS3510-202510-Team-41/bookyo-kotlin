@@ -1,20 +1,23 @@
 package com.bookyo.home
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
+
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.amplifyframework.api.graphql.model.ModelPagination
 import com.amplifyframework.api.graphql.model.ModelQuery
 import com.amplifyframework.datastore.generated.model.Book
 import com.amplifyframework.kotlin.core.Amplify
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.supervisorScope
 
 class HomeViewModel : ViewModel() {
 
-    private val _books = MutableLiveData<List<Book>>()
-    val books: LiveData<List<Book>> get() = _books
+    //Usar state flows
+    private val _books = MutableStateFlow<List<Book>>(emptyList())
+    val books: StateFlow<List<Book>> = _books.asStateFlow()
 
     init {
         loadBooks()
