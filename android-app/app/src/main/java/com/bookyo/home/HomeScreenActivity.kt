@@ -8,15 +8,13 @@ import androidx.activity.viewModels
 import androidx.compose.foundation.background
 import androidx.compose.runtime.Composable
 import com.bookyo.ui.BookyoTheme
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Surface
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.bookyo.components.BookyoButton
 import com.bookyo.components.BottomNavigationBar
@@ -83,13 +81,15 @@ fun HomeScreen(viewModel: HomeViewModel) {
                         .size(300.dp, 170.dp)
                         .background(whiteGray)
                 ) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        books.forEach { book ->
-                            Text(
-                                text = book.title,
-                                style = typography.displaySmall,
-                                modifier = Modifier.padding(4.dp)
-                            )
+                    LazyRow(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(8.dp),
+                        horizontalArrangement = Arrangement.spacedBy(16.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        items(books.size) { index ->
+                            books[index].title
                         }
                     }
                 }
