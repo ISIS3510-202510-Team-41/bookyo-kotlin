@@ -41,12 +41,21 @@
             android:windowSoftInputMode="adjustResize"
             android:label="Sign Up"/>
 
-
+        <!-- Home Activity -->
         <activity
             android:name="com.bookyo.home.HomeScreenActivity"
             android:exported="false"
             android:theme="@style/Theme.Bookyo"
             android:label="Home"
+            />
+
+        <!-- Publish Activity -->
+        <activity
+            android:name="com.bookyo.publish.PublishScreenActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Bookyo"
+            android:windowSoftInputMode="adjustResize"
+            android:label="Publish"
             />
 
     </application>
