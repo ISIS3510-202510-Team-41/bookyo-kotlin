@@ -1,17 +1,18 @@
 package com.bookyo.auth.signup
 
-
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -25,19 +26,18 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.bookyo.R
 import com.bookyo.auth.AuthBaseActivity
 import com.bookyo.components.BookyoButton
 import com.bookyo.components.BookyoTextField
-import com.bookyo.components.ToastHandler
-import com.bookyo.components.ToastState
-import com.bookyo.components.rememberToastState
 import com.bookyo.home.HomeScreenActivity
 import com.bookyo.ui.BookyoTheme
+import com.bookyo.R
+import com.bookyo.components.BookyoLogo
 
 class SignUpActivity: AuthBaseActivity() {
     private val viewModel: SignUpViewModel by viewModels()
@@ -48,194 +48,216 @@ class SignUpActivity: AuthBaseActivity() {
 
     override fun showAuthFlow() {
         setContent {
-            SignUpFlow(viewModel = viewModel, {
-                val intent = Intent(this, HomeScreenActivity::class.java).apply {
-                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                }
-                startActivity(intent)
-                finish()
-            })
+            BookyoTheme {
+                SignUpFlow(
+                    viewModel = viewModel,
+                    onSignUpSuccess = {
+                        val intent = Intent(this, HomeScreenActivity::class.java).apply {
+                            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                        }
+                        startActivity(intent)
+                        finish()
+                    }
+                )
+            }
         }
     }
-
 
     @Composable
     private fun SignUpFlow(
-        viewModel: SignUpViewModel, onSignUpSuccess: () -> Unit
+        viewModel: SignUpViewModel,
+        onSignUpSuccess: () -> Unit
     ) {
-        BookyoTheme {
-
-            SignUpScreen(viewModel = viewModel, onSignUpSuccess = onSignUpSuccess)
+        Box(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.surface)) {
+            when (viewModel.currentState) {
+                SignUpState.WaitingForConfirmation -> ConfirmationForm(viewModel, onSignUpSuccess)
+                else -> SignUpForm(viewModel)
+            }
         }
     }
 
-
     @Composable
-    fun SignUpScreen(
-        viewModel: SignUpViewModel, onSignUpSuccess: () -> Unit
-    ) {
+    fun SignUpForm(viewModel: SignUpViewModel) {
         val scrollState = rememberScrollState()
-        val toastState = rememberToastState()
-
+        val showPassword = remember { mutableStateOf(false) }
+        val showConfirmPassword = remember { mutableStateOf(false) }
 
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .verticalScroll(scrollState)
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Header(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(32.dp),
-                state = viewModel.currentState
-            )
 
-            when (viewModel.currentState) {
-                SignUpState.WaitingForConfirmation -> ConfirmationForm(viewModel, onSignUpSuccess, toastState)
-                else -> SignUpForm(viewModel, modifier = Modifier.verticalScroll(scrollState), toastState)
-            }
-        }
-    }
+            BookyoLogo(Modifier.size(250.dp))
 
-    @Composable
-    fun Header(modifier: Modifier, state: SignUpState) {
-        Box(
-            modifier = modifier, contentAlignment = Alignment.CenterStart
-        ) {
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // Welcome Text
             Text(
-                text = when (state) {
-                    SignUpState.WaitingForConfirmation -> "Confirm Your Email"
-                    else -> "Create Your Account"
-                }, style = MaterialTheme.typography.displayLarge
+                text = "Welcome to the marketplace!",
+                color = MaterialTheme.colorScheme.onSurface,
+                style = MaterialTheme.typography.displayMedium,
+                fontWeight = FontWeight.SemiBold,
+                textAlign = TextAlign.Center
             )
-        }
-    }
 
-    @Composable
-    fun SignUpForm(viewModel: SignUpViewModel, modifier: Modifier, toastState: ToastState) {
-        val showPassword = remember { mutableStateOf(false) }
+            Spacer(modifier = Modifier.height(32.dp))
 
-        Column(
-            modifier = modifier,
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Existing form fields...
+            // First Name Field
             BookyoTextField(
                 value = viewModel.firstName,
                 onValueChange = { viewModel.firstName = it },
                 label = "First Name",
-                modifier = Modifier.padding(52.dp, 0.dp),
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Text,
+                    imeAction = ImeAction.Next
+                )
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
+            // Last Name Field
             BookyoTextField(
                 value = viewModel.lastName,
                 onValueChange = { viewModel.lastName = it },
                 label = "Last Name",
-                modifier = Modifier.padding(52.dp, 0.dp),
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Text,
+                    imeAction = ImeAction.Next
+                )
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
+            // Email Field
             BookyoTextField(
                 value = viewModel.email,
                 onValueChange = { viewModel.email = it },
-                label = "Email Address",
-                modifier = Modifier.padding(52.dp, 0.dp),
+                label = "Email",
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Email,
+                    imeAction = ImeAction.Next
+                )
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
+            // Phone Field
             BookyoTextField(
                 value = viewModel.phone,
                 onValueChange = { viewModel.phone = it },
                 label = "Phone",
-                modifier = Modifier.padding(52.dp, 0.dp),
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Phone,
+                    imeAction = ImeAction.Next
+                )
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
+            // Address Field
             BookyoTextField(
                 value = viewModel.address,
                 onValueChange = { viewModel.address = it },
                 label = "Address",
-                modifier = Modifier.padding(52.dp, 0.dp),
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Text,
+                    imeAction = ImeAction.Next
+                )
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
+            // Password Field
             BookyoTextField(
                 value = viewModel.password,
                 onValueChange = { viewModel.password = it },
                 label = "Password",
-                modifier = Modifier.padding(52.dp, 0.dp),
-                isPassword = true,
+                isPassword = showPassword.value,
                 keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Password, imeAction = ImeAction.Done
+                    keyboardType = KeyboardType.Password,
+                    imeAction = ImeAction.Next
                 ),
                 trailingIcon = {
                     IconButton(onClick = { showPassword.value = !showPassword.value }) {
                         Icon(
-                            painter = painterResource(R.drawable.visibility_24px),
+                            painter = painterResource(
+                                if (showPassword.value) R.drawable.visibility_24px
+                                else R.drawable.visibility_24px
+                            ),
                             contentDescription = "Toggle password visibility",
-                            tint = MaterialTheme.colorScheme.onPrimary
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
-                })
+                }
+            )
 
             Spacer(modifier = Modifier.height(16.dp))
 
+            // Confirm Password Field
             BookyoTextField(
                 value = viewModel.confirmPassword,
                 onValueChange = { viewModel.confirmPassword = it },
                 label = "Confirm Password",
-                modifier = Modifier.padding(52.dp, 0.dp),
-                isPassword = true,
+                isPassword = showPassword.value,
                 keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Password, imeAction = ImeAction.Done
+                    keyboardType = KeyboardType.Password,
+                    imeAction = ImeAction.Done
                 ),
                 trailingIcon = {
-                    IconButton(onClick = { showPassword.value = !showPassword.value }) {
+                    IconButton(onClick = { showConfirmPassword.value = !showConfirmPassword.value }) {
                         Icon(
-                            painter = painterResource(R.drawable.visibility_24px),
+                            painter = painterResource(
+                                if (showConfirmPassword.value) R.drawable.visibility_24px
+                                else R.drawable.visibility_24px
+                            ),
                             contentDescription = "Toggle password visibility",
-                            tint = MaterialTheme.colorScheme.onPrimary
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
-                })
-
-            // Error message for confirmation
-            when (viewModel.currentState) {
-                is SignUpState.Error -> {
-                    toastState.showError((viewModel.currentState as SignUpState.Error).message)
-                    ToastHandler(toastState)
-                    viewModel.currentState = SignUpState.Initial
                 }
+            )
 
-                else -> {}
+            // Error message
+            if (viewModel.currentState is SignUpState.Error) {
+                Text(
+                    text = (viewModel.currentState as SignUpState.Error).message,
+                    color = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.padding(vertical = 8.dp)
+                )
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(32.dp))
 
+            // Sign Up Button
             BookyoButton(
+                text = if (viewModel.currentState is SignUpState.Loading) "Creating Account..." else "Sign up",
                 onClick = { viewModel.signUp() },
                 enabled = viewModel.currentState !is SignUpState.Loading,
-                text = if (viewModel.currentState is SignUpState.Loading) "Creating Account..." else "Sign Up"
+                modifier = Modifier.width(124.dp)
             )
         }
     }
 
     @Composable
-    fun ConfirmationForm(viewModel: SignUpViewModel, onConfirmationSuccess: () -> Unit, toastState: ToastState) {
+    fun ConfirmationForm(viewModel: SignUpViewModel, onConfirmationSuccess: () -> Unit) {
+        // Keeping the confirmation screen as is
         Column(
             modifier = Modifier
-                .fillMaxWidth()
+                .fillMaxSize()
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Spacer(modifier = Modifier.height(32.dp))
+
+            Text(
+                text = "Confirm Your Email",
+                style = MaterialTheme.typography.displayMedium
+            )
+
+            Spacer(modifier = Modifier.height(24.dp))
 
             Text(
                 text = "We've sent a confirmation code to ${viewModel.email}",
@@ -250,35 +272,28 @@ class SignUpActivity: AuthBaseActivity() {
                 value = viewModel.confirmationCode,
                 onValueChange = { viewModel.confirmationCode = it },
                 label = "Confirmation Code",
-                modifier = Modifier.padding(52.dp, 0.dp),
                 keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Number, imeAction = ImeAction.Done
+                    keyboardType = KeyboardType.Number,
+                    imeAction = ImeAction.Done
                 )
             )
 
-            Spacer(modifier = Modifier.height(24.dp))
-
             // Error message for confirmation
-            when (viewModel.currentState) {
-                is SignUpState.Error -> {
-                    toastState.showError((viewModel.currentState as SignUpState.Error).message)
-                    ToastHandler(toastState)
-                    viewModel.currentState = SignUpState.Initial
-                }
-
-                else -> {}
+            if (viewModel.currentState is SignUpState.Error) {
+                Text(
+                    text = (viewModel.currentState as SignUpState.Error).message,
+                    color = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.padding(vertical = 8.dp)
+                )
             }
 
+            Spacer(modifier = Modifier.height(24.dp))
+
             BookyoButton(
+                text = if (viewModel.currentState is SignUpState.Loading) "Confirming..." else "Confirm Email",
                 onClick = { viewModel.confirmSignUp(onConfirmationSuccess) },
-                enabled = viewModel.currentState !is SignUpState.Loading,
-                text = if (viewModel.currentState is SignUpState.Loading) "Confirming..." else "Confirm Email"
+                enabled = viewModel.currentState !is SignUpState.Loading
             )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
         }
     }
-
-
 }

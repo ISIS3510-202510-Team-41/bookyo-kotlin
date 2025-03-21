@@ -1,6 +1,9 @@
 package com.bookyo.components
 
-import androidx.compose.material.*
+
+import androidx.compose.material.BottomNavigation
+import androidx.compose.material.BottomNavigationItem
+import androidx.compose.material.Icon
 import androidx.compose.runtime.Composable
 import com.bookyo.ui.*
 import androidx.compose.ui.res.painterResource

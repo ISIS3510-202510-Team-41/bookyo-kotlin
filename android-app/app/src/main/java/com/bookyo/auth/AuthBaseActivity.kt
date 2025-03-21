@@ -1,9 +1,11 @@
 package com.bookyo.auth
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.lifecycle.lifecycleScope
+import com.bookyo.home.HomeScreenActivity
 import kotlinx.coroutines.launch
 
 abstract class AuthBaseActivity : ComponentActivity() {
@@ -34,7 +36,10 @@ abstract class AuthBaseActivity : ComponentActivity() {
     }
 
     private fun navigateToApp() {
-        //TODO()
+        val intent = Intent(this, HomeScreenActivity::class.java)
+        startActivity(intent)
+        
+        finish()
     }
 
     protected abstract fun showAuthFlow()

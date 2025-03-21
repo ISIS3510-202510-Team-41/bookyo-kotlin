@@ -1,9 +1,7 @@
 package com.bookyo.ui
 
-import androidx.compose.material3.Text
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.googlefonts.Font
@@ -38,12 +36,17 @@ val typography = Typography(
         fontFamily = ParkinsansFontFamily,
         fontSize = 64.sp,
     ),
+    displayMedium = TextStyle(
+        fontFamily = ParkinsansFontFamily,
+        fontSize = 40.sp,
+    ),
     titleMedium = TextStyle(
         fontFamily = RobotoFontFamily,
         fontSize = 26.sp,
     ),
     bodySmall = TextStyle(
         fontFamily = RobotoFontFamily,
-        fontSize = 16.sp
+        fontSize = 16.sp,
+        fontWeight = FontWeight.Normal
     )
 )

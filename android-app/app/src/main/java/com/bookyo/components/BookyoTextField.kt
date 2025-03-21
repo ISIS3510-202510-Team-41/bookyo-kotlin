@@ -11,6 +11,7 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
@@ -45,19 +46,27 @@ fun BookyoTextField(
     TextField(
         value = value,
         onValueChange = onValueChange,
-        label = { Text(text = label) },
+        placeholder = { Text(text = label) },
         modifier = modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp),
-        shape = RoundedCornerShape(12.dp),
+            .padding(horizontal = 24.dp, vertical = 4.dp),
+        shape = RoundedCornerShape(16.dp),
         colors = TextFieldDefaults.colors(
-            focusedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
             focusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
             unfocusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
-            disabledContainerColor = MaterialTheme.colorScheme.outline,
+            disabledContainerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.6f),
+            focusedIndicatorColor = Color.Transparent,
+            unfocusedIndicatorColor = Color.Transparent,
             cursorColor = MaterialTheme.colorScheme.onSurface,
             focusedTextColor = MaterialTheme.colorScheme.onSurface,
             unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
+            focusedPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant,
+            unfocusedPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant,
+            errorContainerColor = MaterialTheme.colorScheme.errorContainer,
+            errorCursorColor = MaterialTheme.colorScheme.onErrorContainer,
+            errorIndicatorColor = Color.Transparent,
+            errorTextColor = MaterialTheme.colorScheme.onErrorContainer,
+            errorPlaceholderColor = MaterialTheme.colorScheme.onErrorContainer.copy(alpha = 0.7f)
         ),
         visualTransformation = if (isPassword) PasswordVisualTransformation() else VisualTransformation.None,
         keyboardOptions = keyboardOptions,
