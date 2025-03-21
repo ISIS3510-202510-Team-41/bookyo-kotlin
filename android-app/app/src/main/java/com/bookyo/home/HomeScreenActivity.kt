@@ -12,6 +12,7 @@ import com.bookyo.ui.BookyoTheme
 import androidx.compose.material3.Text
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.Alignment
@@ -83,13 +84,15 @@ fun HomeScreen(viewModel: HomeViewModel) {
                         .size(300.dp, 170.dp)
                         .background(whiteGray)
                 ) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        books.forEach { book ->
-                            Text(
-                                text = book.title,
-                                style = typography.displaySmall,
-                                modifier = Modifier.padding(4.dp)
-                            )
+                    LazyRow(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(8.dp),
+                        horizontalArrangement = Arrangement.spacedBy(16.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        items(books.size) { index ->
+                            books[index].title
                         }
                     }
                 }
