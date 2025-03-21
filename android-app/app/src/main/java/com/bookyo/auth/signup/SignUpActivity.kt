@@ -175,7 +175,7 @@ class SignUpActivity: AuthBaseActivity() {
                 value = viewModel.password,
                 onValueChange = { viewModel.password = it },
                 label = "Password",
-                isPassword = true,
+                isPassword = showPassword.value,
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Password,
                     imeAction = ImeAction.Next
@@ -201,7 +201,7 @@ class SignUpActivity: AuthBaseActivity() {
                 value = viewModel.confirmPassword,
                 onValueChange = { viewModel.confirmPassword = it },
                 label = "Confirm Password",
-                isPassword = true,
+                isPassword = showPassword.value,
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Password,
                     imeAction = ImeAction.Done
