@@ -1,11 +1,9 @@
 package com.bookyo.components
 
-
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.Icon
 import androidx.compose.runtime.Composable
-import com.bookyo.ui.*
 import androidx.compose.ui.res.painterResource
 import com.bookyo.R
 import androidx.compose.material3.MaterialTheme
@@ -17,8 +15,9 @@ fun BottomNavigationBar(
     onItemSelected: (Int) -> Unit
 ) {
     BottomNavigation(
-        backgroundColor = white,
-        contentColor = black
+        backgroundColor = MaterialTheme.colorScheme.primaryContainer,
+        contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+
     ) {
         val items = listOf("Home", "Search", "Add", "Notifications", "Profile")
         val iconResources = listOf(
@@ -36,7 +35,7 @@ fun BottomNavigationBar(
                 selected = selectedItem == index,
                 onClick = { onItemSelected(index) },
                 selectedContentColor = MaterialTheme.colorScheme.tertiary,
-                unselectedContentColor = MaterialTheme.colorScheme.onTertiary
+                unselectedContentColor = MaterialTheme.colorScheme.onPrimaryContainer
             )
         }
     }

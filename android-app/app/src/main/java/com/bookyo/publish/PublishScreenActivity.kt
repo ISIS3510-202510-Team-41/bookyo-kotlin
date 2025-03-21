@@ -4,6 +4,7 @@ import android.content.res.Configuration
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -13,6 +14,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -29,6 +32,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -37,6 +41,7 @@ import com.bookyo.components.BookyoTextField
 import com.bookyo.components.rememberToastState
 import com.bookyo.components.ToastHandler
 import com.bookyo.R
+import com.bookyo.components.BottomNavigationBar
 import com.bookyo.components.ImageUploadBox
 import com.bookyo.ui.BookyoTheme
 
@@ -45,7 +50,6 @@ class PublishScreenActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             BookyoTheme {
-                // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
@@ -63,26 +67,30 @@ fun PublishScreen() {
     val scrollState = rememberScrollState()
     val toastState = rememberToastState()
 
-    // Form state
+    var selectedItem by remember { mutableStateOf(2) }
+
     var isbn by remember { mutableStateOf("") }
     var title by remember { mutableStateOf("") }
     var author by remember { mutableStateOf("") }
 
     Scaffold(
         topBar = {
-            TopAppBar(
+            CenterAlignedTopAppBar(
                 title = {
                     Text(
                         "Publish",
                         style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.onSurface
+                        color = MaterialTheme.colorScheme.onSurface,
                     )
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.surface
                 ),
                 actions = {
-                    IconButton(onClick = { /* Shopping cart action */ }) {
+                    IconButton(
+                        onClick = {
+                            // Shopping cart action
+                            toastState.showInfo("Shopping cart not implemented yet") }) {
                         Icon(
                             painter = painterResource(id = R.drawable.ic_shopping_cart),
                             contentDescription = "Shopping Cart",
@@ -91,7 +99,16 @@ fun PublishScreen() {
                     }
                 }
             )
-        }
+        },
+        bottomBar = {
+            BottomNavigationBar(
+                selectedItem = selectedItem,
+                onItemSelected = { index ->
+                    selectedItem = index
+                }
+            )
+        },
+        containerColor = MaterialTheme.colorScheme.surface
     ) { paddingValues ->
         Column(
             modifier = Modifier
@@ -102,7 +119,6 @@ fun PublishScreen() {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Top
         ) {
-            // Image upload area with X pattern
             ImageUploadBox(
                 onClick = {
                     // Handle image selection
@@ -112,7 +128,6 @@ fun PublishScreen() {
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Form fields
             BookyoTextField(
                 value = isbn,
                 onValueChange = { isbn = it },
@@ -136,7 +151,6 @@ fun PublishScreen() {
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Publish button
             BookyoButton(
                 text = "Publish",
                 onClick = {
@@ -144,11 +158,11 @@ fun PublishScreen() {
                     toastState.showSuccess("Book published successfully!")
                 },
                 modifier = Modifier
-                    .fillMaxWidth(0.5f)
-            )
+                    .fillMaxWidth(0.5f),
+                isPrimary = false
+                )
         }
 
-        // Toast messages handler
         ToastHandler(toastState)
     }
 }
