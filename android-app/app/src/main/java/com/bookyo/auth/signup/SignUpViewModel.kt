@@ -54,6 +54,8 @@ class SignUpViewModel(
             email.isBlank() -> "Email is required"
             !email.contains("@") -> "Invalid email format"
             password.length < 8 -> "Password must be at least 8 characters"
+            !password.matches(Regex("^(?=.*[0-9])(?=.*[A-Z])(?=.*[a-z])(?=.*[!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>/?]).{8,}$")) ->
+                "Password must contain at least 1 number, 1 uppercase letter, 1 lowercase letter, and 1 special character"
             else -> null
         }
     }

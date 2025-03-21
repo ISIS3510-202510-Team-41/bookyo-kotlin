@@ -1,5 +1,6 @@
 package com.bookyo.home
 
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.*
@@ -8,24 +9,23 @@ import androidx.activity.viewModels
 import androidx.compose.foundation.background
 import androidx.compose.runtime.Composable
 import com.bookyo.ui.BookyoTheme
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Surface
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.bookyo.components.BookyoButton
 import com.bookyo.components.BottomNavigationBar
 import com.bookyo.ui.*
 import androidx.compose.runtime.*
+import com.bookyo.auth.AmplifyAuthManager
 
 class HomeScreenActivity: ComponentActivity() {
 
     private val viewModel: HomeViewModel by viewModels()
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -124,7 +124,12 @@ fun HomeScreen(viewModel: HomeViewModel) {
         // Barra de navegación inferior
         BottomNavigationBar(
             selectedItem = selectedItem,
-            onItemSelected = { index -> selectedItem = index }
+            onItemSelected = { index ->
+                {
+                    selectedItem = index
+
+                }
+            }
         )
     }
 }

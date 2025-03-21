@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.supervisorScope
 
-class HomeViewModel : ViewModel() {
+class HomeViewModel() : ViewModel() {
 
     //Usar state flows
     private val _books = MutableStateFlow<List<Book>>(emptyList())
@@ -43,4 +43,5 @@ class HomeViewModel : ViewModel() {
             emptyList()
         }
     }
+
 }
