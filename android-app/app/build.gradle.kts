@@ -67,6 +67,9 @@ dependencies {
     implementation("androidx.compose.material3:material3:1.2.0")
     implementation("androidx.compose.material:material:1.5.0")
 
+    implementation("io.coil-kt.coil3:coil-compose:3.1.0")
+
+
     // Amplify dependency
     implementation("com.amplifyframework:core-kotlin:2.24.0")
 

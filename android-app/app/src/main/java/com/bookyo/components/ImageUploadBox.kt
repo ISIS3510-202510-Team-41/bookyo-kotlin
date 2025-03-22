@@ -1,6 +1,8 @@
 package com.bookyo.components
 
+import android.net.Uri
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -18,8 +20,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import coil3.compose.rememberAsyncImagePainter
 import com.bookyo.ui.lightGray
 import com.bookyo.ui.whiteGray
 
@@ -27,7 +31,9 @@ import com.bookyo.ui.whiteGray
 fun ImageUploadBox(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    text: String = "Upload your images"
+    text: String = "Upload your images",
+    hasImage: Boolean = false,
+    imageUri: Uri? = null
 ) {
     Box(
         modifier = modifier
@@ -43,39 +49,52 @@ fun ImageUploadBox(
             .clickable(onClick = onClick),
         contentAlignment = Alignment.Center
     ) {
-        // Draw the X pattern
-        Canvas(modifier = Modifier.fillMaxSize()) {
-            val strokeWidth = 1.dp.toPx()
-            val lineColor = lightGray.copy(alpha = 0.5f)
-
-            // Draw diagonal lines to form an X
-            drawLine(
-                color = lineColor,
-                start = Offset(0f, 0f),
-                end = Offset(size.width, size.height),
-                strokeWidth = strokeWidth,
-                cap = StrokeCap.Round
+        if (hasImage && imageUri != null) {
+            // Display the selected image
+            Image(
+                painter = rememberAsyncImagePainter(imageUri),
+                contentDescription = "Selected book cover",
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Crop
             )
+        } else {
+            // Draw the X pattern for empty state
+            Canvas(modifier = Modifier.fillMaxSize()) {
+                val strokeWidth = 1.dp.toPx()
+                val lineColor = lightGray.copy(alpha = 0.5f)
 
-            drawLine(
-                color = lineColor,
-                start = Offset(size.width, 0f),
-                end = Offset(0f, size.height),
-                strokeWidth = strokeWidth,
-                cap = StrokeCap.Round
-            )
+                // Draw diagonal lines to form an X
+                drawLine(
+                    color = lineColor,
+                    start = Offset(0f, 0f),
+                    end = Offset(size.width, size.height),
+                    strokeWidth = strokeWidth,
+                    cap = StrokeCap.Round
+                )
+
+                drawLine(
+                    color = lineColor,
+                    start = Offset(size.width, 0f),
+                    end = Offset(0f, size.height),
+                    strokeWidth = strokeWidth,
+                    cap = StrokeCap.Round
+                )
+            }
         }
 
-        // Text overlay
+        // Overlay text (shown in both states)
         Column(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(
-                text = text,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                textAlign = TextAlign.Center
-            )
+            // Only show text if there's no image or if it's a prompt to change
+            if (!hasImage || text.contains("Change")) {
+                Text(
+                    text = text,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = if (hasImage) MaterialTheme.colorScheme.surface else MaterialTheme.colorScheme.onSurfaceVariant,
+                    textAlign = TextAlign.Center
+                )
+            }
         }
     }
 }

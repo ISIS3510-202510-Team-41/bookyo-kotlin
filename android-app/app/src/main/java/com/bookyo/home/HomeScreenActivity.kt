@@ -1,5 +1,6 @@
 package com.bookyo.home
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.*
@@ -33,6 +34,8 @@ import com.bookyo.components.Navigation
 import com.bookyo.components.rememberToastState
 import com.amplifyframework.datastore.generated.model.Book
 import com.bookyo.components.BookThumbnail
+import com.bookyo.publish.PublishScreen
+import com.bookyo.publish.PublishScreenActivity
 
 class HomeScreenActivity: ComponentActivity() {
 
@@ -44,7 +47,9 @@ class HomeScreenActivity: ComponentActivity() {
 
         setContent {
             BookyoTheme {
-                HomeScreen(viewModel)
+                HomeScreen(viewModel, onPublishClick = {
+                    startActivity(Intent(this, PublishScreenActivity::class.java))
+                })
             }
         }
     }
@@ -52,7 +57,7 @@ class HomeScreenActivity: ComponentActivity() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen(viewModel: HomeViewModel) {
+fun HomeScreen(viewModel: HomeViewModel, onPublishClick: () -> Unit) {
 
     // Collect books as state
     val books by viewModel.books.collectAsState()
@@ -189,7 +194,9 @@ fun HomeScreen(viewModel: HomeViewModel) {
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         BookyoButton(
-                            onClick = { /* Action for publishing a book */ },
+                            onClick = {
+                                onPublishClick()
+                                      },
                             modifier = Modifier.fillMaxWidth(0.8f),
                             text = "Publish Book"
                         )
