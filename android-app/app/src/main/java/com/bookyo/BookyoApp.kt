@@ -9,6 +9,8 @@ import com.amplifyframework.api.aws.AWSApiPlugin
 import com.amplifyframework.auth.cognito.AWSCognitoAuthPlugin
 import com.amplifyframework.analytics.pinpoint.AWSPinpointAnalyticsPlugin
 import com.amplifyframework.core.Amplify as JavaAmplify
+import com.amplifyframework.storage.s3.AWSS3StoragePlugin
+
 
 
 
@@ -21,6 +23,8 @@ class BookyoApp: Application() {
 
             val analyticsPlugin = AWSPinpointAnalyticsPlugin()
             Amplify.addPlugin(analyticsPlugin)
+
+            Amplify.addPlugin(AWSS3StoragePlugin())
 
             Amplify.addPlugin(AWSCognitoAuthPlugin())
             Amplify.addPlugin(AWSApiPlugin())

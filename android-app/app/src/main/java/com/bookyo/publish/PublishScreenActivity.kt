@@ -84,9 +84,6 @@ fun PublishScreen(viewModel: PublishViewModel, onPublishSuccess: () -> Unit) {
 
     var selectedItem by remember { mutableIntStateOf(2) }
 
-    var isbn by remember { mutableStateOf("") }
-    var title by remember { mutableStateOf("") }
-    var author by remember { mutableStateOf("") }
 
     val imagePickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
@@ -162,22 +159,22 @@ fun PublishScreen(viewModel: PublishViewModel, onPublishSuccess: () -> Unit) {
             Spacer(modifier = Modifier.height(16.dp))
 
             BookyoTextField(
-                value = isbn,
-                onValueChange = { isbn = it },
+                value = viewModel.isbn,
+                onValueChange = { viewModel.isbn = it },
                 label = "ISBN",
                 modifier = Modifier.fillMaxWidth()
             )
 
             BookyoTextField(
-                value = title,
-                onValueChange = { title = it },
+                value = viewModel.title,
+                onValueChange = { viewModel.title = it },
                 label = "Title",
                 modifier = Modifier.fillMaxWidth()
             )
 
             BookyoTextField(
-                value = author,
-                onValueChange = { author = it },
+                value = viewModel.authorName,
+                onValueChange = { viewModel.authorName = it },
                 label = "Author",
                 modifier = Modifier.fillMaxWidth()
             )
@@ -187,8 +184,7 @@ fun PublishScreen(viewModel: PublishViewModel, onPublishSuccess: () -> Unit) {
             BookyoButton(
                 text = "Publish",
                 onClick = {
-                    // Handle publish action
-                    toastState.showSuccess("Book published successfully!")
+                    viewModel.publishBook()
                 },
                 modifier = Modifier
                     .fillMaxWidth(0.5f),
