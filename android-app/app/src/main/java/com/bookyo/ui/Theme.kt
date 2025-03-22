@@ -9,7 +9,7 @@ import androidx.compose.runtime.Composable
 private val LightModeScheme = lightColorScheme(
     primary = green,
     onPrimary = black,
-    primaryContainer = whiteGray,
+    primaryContainer = white,
     secondaryContainer = whiteGray,
     onPrimaryContainer = lightGray,
     surface = white,
@@ -30,7 +30,7 @@ private val DarkModeScheme = darkColorScheme(
     onPrimary = black,
     primaryContainer = blueGray,
     secondaryContainer = blueGray,
-    onPrimaryContainer = lightGray,
+    onPrimaryContainer = whiteGray,
     surface = black,
     onSurface = white,
     onSurfaceVariant = lightGray,

@@ -1,17 +1,12 @@
 package com.bookyo.components
 
-
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.Icon
 import androidx.compose.runtime.Composable
-import com.bookyo.ui.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.AddCircle
-import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material.icons.filled.Person
+import androidx.compose.ui.res.painterResource
+import com.bookyo.R
+import androidx.compose.material3.MaterialTheme
 
 
 @Composable
@@ -20,21 +15,27 @@ fun BottomNavigationBar(
     onItemSelected: (Int) -> Unit
 ) {
     BottomNavigation(
-        backgroundColor = white,
-        contentColor = black
+        backgroundColor = MaterialTheme.colorScheme.primaryContainer,
+        contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+
     ) {
         val items = listOf("Home", "Search", "Add", "Notifications", "Profile")
-        val icons = listOf(Icons.Default.Home, Icons.Default.Search, Icons.Default.AddCircle,
-            Icons.Default.Notifications, Icons.Default.Person)
+        val iconResources = listOf(
+            R.drawable.ic_home,
+            R.drawable.ic_search,
+            R.drawable.ic_plus,
+            R.drawable.ic_bell,
+            R.drawable.ic_person
+        )
 
         items.forEachIndexed { index, item ->
             BottomNavigationItem(
-                icon = { Icon(imageVector = icons[index], contentDescription = item) },
+                icon = { Icon(painter = painterResource(id = iconResources[index]), contentDescription = item) },
                 //label = { Text(item) },
                 selected = selectedItem == index,
                 onClick = { onItemSelected(index) },
-                selectedContentColor = orange,
-                unselectedContentColor = blueGray
+                selectedContentColor = MaterialTheme.colorScheme.tertiary,
+                unselectedContentColor = MaterialTheme.colorScheme.onPrimaryContainer
             )
         }
     }
