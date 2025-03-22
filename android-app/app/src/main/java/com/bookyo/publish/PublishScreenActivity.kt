@@ -139,7 +139,7 @@ fun PublishScreen(viewModel: PublishViewModel, onPublishSuccess: () -> Unit) {
             )
         },
         bottomBar = {
-            BottomNavigationBar(currentScreenIndex = currentScreenIndex)
+            BottomNavigationBar(currentScreenIndex = selectedItem)
         },
         containerColor = MaterialTheme.colorScheme.surface
     ) { paddingValues ->
