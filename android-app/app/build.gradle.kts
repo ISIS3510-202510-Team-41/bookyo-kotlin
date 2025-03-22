@@ -78,5 +78,6 @@ dependencies {
 
     implementation("com.amplifyframework:core:2.24.0")
     implementation("com.amplifyframework:aws-core:2.24.0")
+    implementation("com.amplifyframework:aws-storage-s3:2.13.1")
 
 }
