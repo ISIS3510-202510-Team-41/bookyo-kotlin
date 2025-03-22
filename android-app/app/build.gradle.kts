@@ -5,11 +5,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.bookyo"
+    namespace = "com.bookyo"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.example.bookyo"
+        applicationId = "com.bookyo"
         minSdk = 24
         targetSdk = 35
         versionCode = 1
@@ -30,9 +30,12 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
+        isCoreLibraryDesugaringEnabled = true
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
     }
     kotlinOptions {
-        jvmTarget = "11"
+        jvmTarget = "1.8"
     }
     buildFeatures {
         compose = true
@@ -56,4 +59,28 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.3")
+
+    implementation ("com.google.accompanist:accompanist-permissions:0.32.0")
+    implementation("androidx.compose.ui:ui-text-google-fonts:1.5.4")
+    implementation("androidx.compose.material3:material3:1.2.0")
+    implementation("androidx.compose.material:material:1.5.0")
+
+    implementation("io.coil-kt.coil3:coil-compose:3.1.0")
+
+
+    // Amplify dependency
+    implementation("com.amplifyframework:core-kotlin:2.24.0")
+
+    implementation("com.amplifyframework:aws-api:2.24.0")
+    implementation("com.amplifyframework:aws-auth-cognito:2.24.0")
+    implementation("com.amplifyframework:aws-analytics-pinpoint:2.24.0")
+
+
+
+    implementation("com.amplifyframework:core:2.24.0")
+    implementation("com.amplifyframework:aws-core:2.24.0")
+    implementation("com.amplifyframework:aws-storage-s3:2.13.1")
+
 }
