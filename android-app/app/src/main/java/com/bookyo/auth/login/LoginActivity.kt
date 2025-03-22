@@ -55,6 +55,7 @@ class LoginActivity: AuthBaseActivity() {
                     onRegisterClick = {
                         val intent = Intent(this, SignUpActivity::class.java)
                         startActivity(intent)
+
                     }
                 )
             }

@@ -1,9 +1,14 @@
 package com.bookyo.publish
 
+import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.compose.runtime.collectAsState
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -24,6 +29,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -36,12 +42,20 @@ import com.bookyo.components.BookyoButton
 import com.bookyo.components.BookyoTextField
 import com.bookyo.components.rememberToastState
 import com.bookyo.components.ToastHandler
+import android.net.Uri
+import androidx.compose.runtime.LaunchedEffect
+
 import com.bookyo.R
 import com.bookyo.components.BottomNavigationBar
 import com.bookyo.components.ImageUploadBox
+import com.bookyo.home.HomeScreenActivity
 import com.bookyo.ui.BookyoTheme
 
 class PublishScreenActivity : ComponentActivity() {
+
+    private val viewModel: PublishViewModel by viewModels {
+        PublishViewModelFactory(application)
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -50,7 +64,11 @@ class PublishScreenActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    PublishScreen()
+                    PublishScreen(viewModel = viewModel, onPublishSuccess = {
+                        val intent = Intent(this, HomeScreenActivity::class.java)
+                        startActivity(intent)
+                        finish()
+                    })
                 }
             }
         }
@@ -59,15 +77,39 @@ class PublishScreenActivity : ComponentActivity() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PublishScreen() {
+fun PublishScreen(viewModel: PublishViewModel, onPublishSuccess: () -> Unit) {
     val scrollState = rememberScrollState()
     val toastState = rememberToastState()
+    val uiState by viewModel.uiState.collectAsState()
 
-    var currentScreenIndex by remember { mutableStateOf(2) }
+    var selectedItem by remember { mutableIntStateOf(2) }
 
     var isbn by remember { mutableStateOf("") }
     var title by remember { mutableStateOf("") }
     var author by remember { mutableStateOf("") }
+
+    val imagePickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        uri?.let { viewModel.handleImageSelected(it) }
+    }
+
+    // Handle UI state changes
+    LaunchedEffect(uiState.errorMessage) {
+        uiState.errorMessage?.let {
+            toastState.showError(it)
+        }
+    }
+
+    LaunchedEffect(uiState.successMessage) {
+        uiState.successMessage?.let {
+            toastState.showSuccess(it)
+            // Navigate on success message
+            if (uiState.publishState == PublishState.SUCCESS) {
+                onPublishSuccess()
+            }
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -112,7 +154,7 @@ fun PublishScreen() {
         ) {
             ImageUploadBox(
                 onClick = {
-                    // Handle image selection
+                    imagePickerLauncher.launch("image/*")
                     toastState.showInfo("Image upload not implemented yet")
                 }
             )
@@ -155,21 +197,5 @@ fun PublishScreen() {
         }
 
         ToastHandler(toastState)
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun PreviewPublishScreen() {
-    BookyoTheme {
-        PublishScreen()
-    }
-}
-
-@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
-@Composable
-fun PreviewPublishScreenDark() {
-    BookyoTheme {
-        PublishScreen()
     }
 }
