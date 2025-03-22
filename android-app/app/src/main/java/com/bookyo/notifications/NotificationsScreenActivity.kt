@@ -1,5 +1,6 @@
 package com.bookyo.notifications
 
+import android.content.res.Configuration
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -32,9 +33,11 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -72,8 +75,9 @@ class NotificationsScreenActivity : ComponentActivity() {
 fun NotificationsScreen(
     onNavigateBack: () -> Unit = {}
 ) {
-    val selectedNavItem = remember { mutableStateOf(3) } // 3 is the index for Notifications
     val toastState = rememberToastState()
+
+    var currentScreenIndex by remember { mutableStateOf(3) }
 
     // Sample notification data
     val notifications = remember {
@@ -113,10 +117,7 @@ fun NotificationsScreen(
             )
         },
         bottomBar = {
-            BottomNavigationBar(
-                selectedItem = selectedNavItem.value,
-                onItemSelected = { selectedNavItem.value = it }
-            )
+            BottomNavigationBar(currentScreenIndex = currentScreenIndex)
         }
     ) { paddingValues ->
 
@@ -220,6 +221,7 @@ fun NotificationCard(
                 )
             }
         }
+        ToastHandler(toastState = toastState)
     }
 }
 
@@ -233,6 +235,15 @@ data class NotificationItem(
 @Preview(showBackground = true)
 @Composable
 fun NotificationsScreenPreview() {
+    BookyoTheme {
+        NotificationsScreen()
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Preview(showBackground = true,  uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+fun NotificationsScreenPreviewDark() {
     BookyoTheme {
         NotificationsScreen()
     }

@@ -4,7 +4,6 @@ import android.content.res.Configuration
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -14,7 +13,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -23,7 +21,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -32,7 +29,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -67,7 +63,7 @@ fun PublishScreen() {
     val scrollState = rememberScrollState()
     val toastState = rememberToastState()
 
-    var selectedItem by remember { mutableStateOf(2) }
+    var currentScreenIndex by remember { mutableStateOf(2) }
 
     var isbn by remember { mutableStateOf("") }
     var title by remember { mutableStateOf("") }
@@ -101,12 +97,7 @@ fun PublishScreen() {
             )
         },
         bottomBar = {
-            BottomNavigationBar(
-                selectedItem = selectedItem,
-                onItemSelected = { index ->
-                    selectedItem = index
-                }
-            )
+            BottomNavigationBar(currentScreenIndex = currentScreenIndex)
         },
         containerColor = MaterialTheme.colorScheme.surface
     ) { paddingValues ->
