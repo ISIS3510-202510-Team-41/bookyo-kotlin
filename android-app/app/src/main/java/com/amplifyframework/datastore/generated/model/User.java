@@ -49,7 +49,6 @@ public final class User implements Model {
   private final @ModelField(targetType="UserRating") @HasMany(associatedWith = "user", type = UserRating.class) ModelList<UserRating> ratings = null;
   private final @ModelField(targetType="Listing") @HasMany(associatedWith = "user", type = Listing.class) ModelList<Listing> listings = null;
   private final @ModelField(targetType="Wishlist") @HasOne(associatedWith = "user", type = Wishlist.class) ModelReference<Wishlist> wishlist = null;
-  private final @ModelField(targetType="Notifications") @HasMany(associatedWith = "user", type = Notifications.class) ModelList<Notifications> notifications = null;
   private final @ModelField(targetType="Cart") @HasOne(associatedWith = "user", type = Cart.class) ModelReference<Cart> cart = null;
   private @ModelField(targetType="AWSDateTime", isReadOnly = true) Temporal.DateTime createdAt;
   private @ModelField(targetType="AWSDateTime", isReadOnly = true) Temporal.DateTime updatedAt;
@@ -97,10 +96,6 @@ public final class User implements Model {
   
   public ModelReference<Wishlist> getWishlist() {
       return wishlist;
-  }
-  
-  public ModelList<Notifications> getNotifications() {
-      return notifications;
   }
   
   public ModelReference<Cart> getCart() {

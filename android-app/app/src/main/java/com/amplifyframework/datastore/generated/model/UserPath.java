@@ -13,7 +13,6 @@ public final class UserPath extends ModelPath<User> {
   private UserRatingPath ratings;
   private ListingPath listings;
   private WishlistPath wishlist;
-  private NotificationsPath notifications;
   private CartPath cart;
   UserPath(@NonNull String name, @NonNull Boolean isCollection, @Nullable PropertyPath parent) {
     super(name, isCollection, parent, User.class);
@@ -52,13 +51,6 @@ public final class UserPath extends ModelPath<User> {
       wishlist = new WishlistPath("wishlist", false, this);
     }
     return wishlist;
-  }
-  
-  public synchronized NotificationsPath getNotifications() {
-    if (notifications == null) {
-      notifications = new NotificationsPath("notifications", true, this);
-    }
-    return notifications;
   }
   
   public synchronized CartPath getCart() {
