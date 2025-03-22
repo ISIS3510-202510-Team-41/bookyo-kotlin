@@ -58,6 +58,15 @@
             android:label="Publish"
             />
 
+        <!-- Notifications Activity -->
+        <activity
+            android:name="com.bookyo.notifications.NotificationsScreenActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Bookyo"
+            android:windowSoftInputMode="adjustResize"
+            android:label="Notifications"
+            />
+
     </application>
 
 </manifest>
