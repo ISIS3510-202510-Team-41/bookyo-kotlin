@@ -1,7 +1,5 @@
 package com.bookyo.home
 
-import android.content.Context
-import android.content.res.Configuration
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.*
@@ -26,20 +24,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.dp
 import com.bookyo.components.BookyoButton
-import com.bookyo.components.Navigation
 import com.bookyo.components.BottomNavigationBar
 import com.bookyo.ui.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import com.bookyo.R
+import com.bookyo.components.Navigation
 import com.bookyo.components.rememberToastState
+import com.amplifyframework.datastore.generated.model.Book
+import com.bookyo.components.BookThumbnail
 
 class HomeScreenActivity: ComponentActivity() {
 
     private val viewModel: HomeViewModel by viewModels()
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -104,75 +102,79 @@ fun HomeScreen(viewModel: HomeViewModel) {
         ) {
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Container for spaces 1 and 2
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f), // Distributes space between Toolbar and NavigationBar
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-            ) {
-                // Space 1 - Image + Button
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .size(300.dp, 170.dp)
-                            .background(whiteGray)
-                    ) {
-                        LazyRow(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .padding(8.dp),
-                            horizontalArrangement = Arrangement.spacedBy(16.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            items(books.size) { index ->
-                                // Create a composable for each book item
-                                Card(
-                                    modifier = Modifier
-                                        .width(200.dp)
-                                        .height(150.dp),
-                                    elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-                                    colors = CardDefaults.cardColors(containerColor = whiteGray)
-                                ) {
-                                    Column(
-                                        modifier = Modifier
-                                            .fillMaxSize()
-                                            .padding(12.dp),
-                                        horizontalAlignment = Alignment.CenterHorizontally,
-                                        verticalArrangement = Arrangement.Center
-                                    ) {
-                                        Text(
-                                            text = books[index].title,
-                                            style = typography.displaySmall,
-                                            textAlign = TextAlign.Center,
-                                            maxLines = 2,
-                                            overflow = TextOverflow.Ellipsis
-                                        )
+            Spacer(modifier = Modifier.weight(1f))
+        }
 
-                                        // Add author if available
-                                        books[index].author?.let {
-                                            Spacer(modifier = Modifier.height(4.dp))
-                                            Text(
-                                                text = "by $it",
-                                                style = typography.bodyMedium,
-                                                maxLines = 1,
-                                                overflow = TextOverflow.Ellipsis
-                                            )
-                                        }
-                                    }
-                                }
-                            }
+        // Contenedor de los espacios 1 y 2
+        Column(
+            modifier = Modifier
+                .fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            // Espacio 1 - Imagen + Botón
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(300.dp, 170.dp)
+                        .background(whiteGray)
+                ) {
+                    LazyRow(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(8.dp),
+                        horizontalArrangement = Arrangement.spacedBy(16.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        items(books.size) { index ->
+                            BookCard(book = books[index])
+
+                            // Create a composable for each book item
+//                            Card(
+//                                modifier = Modifier
+//                                    .width(200.dp)
+//                                    .height(150.dp),
+//                                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+//                                colors = CardDefaults.cardColors(containerColor = whiteGray)
+//                            ) {
+//                                Column(
+//                                    modifier = Modifier
+//                                        .fillMaxSize()
+//                                        .padding(12.dp),
+//                                    horizontalAlignment = Alignment.CenterHorizontally,
+//                                    verticalArrangement = Arrangement.Center
+//                                ) {
+//                                    Text(
+//                                        text = books[index].title,
+//                                        style = typography.displaySmall,
+//                                        textAlign = TextAlign.Center,
+//                                        maxLines = 2,
+//                                        overflow = TextOverflow.Ellipsis
+//                                    )
+//
+//                                    // Add author if available
+//                                    books[index].author?.let {
+//                                        Spacer(modifier = Modifier.height(4.dp))
+//                                        Text(
+//                                            text = "by $it",
+//                                            style = typography.bodyMedium,
+//                                            maxLines = 1,
+//                                            overflow = TextOverflow.Ellipsis
+//                                        )
+//                                    }
+//                                }
+//                            }
                         }
                     }
-                    Spacer(modifier = Modifier.height(8.dp))
-                    BookyoButton(
-                        onClick = { /* Action for exploring books */ },
-                        modifier = Modifier.fillMaxWidth(0.8f), // Adjust button size
-                        text = "Browse Books"
-                    )
+                }
+                Spacer(modifier = Modifier.height(8.dp))
+                BookyoButton(
+                    onClick = { /* Acción para explorar libros */ },
+                    modifier = Modifier.fillMaxWidth(0.8f), // Ajustar tamaño del botón
+                    text = "Browse Books"
+                )
 
                     Spacer(modifier = Modifier.height(40.dp)) // Space between elements
 
@@ -196,26 +198,31 @@ fun HomeScreen(viewModel: HomeViewModel) {
             }
         }
     }
-}
 
-@Preview(showBackground = true)
 @Composable
-fun PreviewHomeScreen() {
-    BookyoTheme {
-        HomeScreen(HomeViewModel())
+fun BookCard(
+    modifier: Modifier = Modifier, book: Book
+) {
+    Card(
+        modifier = modifier
+            .fillMaxWidth()
+            .heightIn(min = 300.dp), colors = CardDefaults.cardColors(
+            containerColor = whiteGray,
+        ), elevation = CardDefaults.cardElevation(
+            defaultElevation = 2.dp, pressedElevation = 4.dp
+        )
+    ) {
+        Column(
+            modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+
+            // Thumbnail
+            BookThumbnail(
+                thumbnailKey = book.thumbnail, modifier = Modifier.fillMaxWidth()
+            )
+        }
     }
 }
-
-@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
-@Composable
-fun PreviewHomeScreenDark() {
-    BookyoTheme {
-        HomeScreen(HomeViewModel())
-    }
-}
-
-
-
 
 
 
