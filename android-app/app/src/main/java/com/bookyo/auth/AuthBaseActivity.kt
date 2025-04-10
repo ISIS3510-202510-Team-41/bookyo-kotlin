@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.lifecycle.lifecycleScope
+import com.bookyo.BookyoApp
 import com.bookyo.home.HomeScreenActivity
 import kotlinx.coroutines.launch
 
@@ -36,9 +37,11 @@ abstract class AuthBaseActivity : ComponentActivity() {
     }
 
     private fun navigateToApp() {
+        // Start notification service for users with existing sessions
+        (application.applicationContext as BookyoApp).startNotificationService()
+
         val intent = Intent(this, HomeScreenActivity::class.java)
         startActivity(intent)
-        
         finish()
     }
 

@@ -21,6 +21,7 @@ class BookyoApp: Application() {
         super.onCreate()
 
         try {
+
             // Initialize Amplify plugins
             val analyticsPlugin = AWSPinpointAnalyticsPlugin()
             Amplify.addPlugin(analyticsPlugin)
@@ -29,17 +30,33 @@ class BookyoApp: Application() {
             Amplify.addPlugin(AWSCognitoAuthPlugin())
             Amplify.addPlugin(AWSApiPlugin())
 
+            Log.d("BookyoApp", "Attempting to load Amplify config from: ${R.raw.amplify_outputs}")
+            val configFile = resources.openRawResource(R.raw.amplify_outputs)
+            val size = configFile.available()
+            Log.d("BookyoApp", "Config file size: $size bytes")
+            configFile.close()
+
             Amplify.configure(AmplifyOutputs(R.raw.amplify_outputs), applicationContext)
             JavaAmplify.Analytics.recordEvent("APP_START")
 
             Log.i("BookyoApp", "Initialized Amplify")
 
-            // Initialize and start notification service
+
             notificationService = NotificationService.getInstance(this)
-            notificationService.start()
+
+
 
         } catch (error: AmplifyException) {
             Log.e("BookyoApp", "Could not initialize Amplify", error)
+        }
+    }
+
+    fun startNotificationService() {
+        try {
+            Log.i("BookyoApp", "Starting notification service after successful login")
+            notificationService.start()
+        } catch (e: Exception) {
+            Log.e("BookyoApp", "Failed to start notification service", e)
         }
     }
 }

@@ -25,6 +25,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import com.bookyo.BookyoApp
 import com.bookyo.R
 import com.bookyo.auth.AuthBaseActivity
 import com.bookyo.auth.signup.SignUpActivity
@@ -45,13 +46,7 @@ class LoginActivity: AuthBaseActivity() {
             BookyoTheme {
                 LoginScreen(
                     viewModel = viewModel,
-                    onLoginSuccess = {
-                        val intent = Intent(this, HomeScreenActivity::class.java).apply {
-                            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                        }
-                        startActivity(intent)
-                        finish()
-                    },
+                    onLoginSuccess = { onLoginSuccess() },
                     onRegisterClick = {
                         val intent = Intent(this, SignUpActivity::class.java)
                         startActivity(intent)
@@ -152,5 +147,17 @@ class LoginActivity: AuthBaseActivity() {
                 )
             }
         }
+    }
+
+    private fun onLoginSuccess() {
+        // Start notification service after successful login
+        (applicationContext as? BookyoApp)?.startNotificationService()
+
+        // Navigate to home screen
+        val intent = Intent(this, HomeScreenActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        }
+        startActivity(intent)
+        finish()
     }
 }

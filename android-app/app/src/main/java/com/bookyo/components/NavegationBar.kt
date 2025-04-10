@@ -30,6 +30,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -109,7 +110,7 @@ fun BottomNavigationBar(
 
     // Get unread notifications count if available
     val unreadCount by app?.notificationService?.unreadCount?.collectAsState() ?: remember {
-        mutableStateOf(0)
+        mutableIntStateOf(0)
     }
 
     // Always start expanded
