@@ -3,21 +3,19 @@ package com.bookyo.publish
 import android.app.Application
 import android.net.Uri
 import android.util.Log
-import androidx.activity.result.PickVisualMediaRequest
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.amplifyframework.api.ApiException
 import com.amplifyframework.api.graphql.model.ModelMutation
 import com.amplifyframework.api.graphql.model.ModelQuery
 import com.amplifyframework.datastore.generated.model.Author
 import com.amplifyframework.datastore.generated.model.Book
+import com.amplifyframework.datastore.generated.model.Notification
+import com.amplifyframework.datastore.generated.model.NotificationType
 import com.amplifyframework.kotlin.core.Amplify
 import com.amplifyframework.storage.StoragePath
-import com.amplifyframework.storage.result.StorageUploadFileResult
 import com.bookyo.analytics.BookyoAnalytics
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -30,7 +28,6 @@ import kotlinx.coroutines.withContext
 import java.io.File
 import java.util.UUID
 
-
 enum class PublishState {
     IDLE,
     LOADING,
@@ -38,7 +35,7 @@ enum class PublishState {
     ERROR
 }
 
-data class PublishUIState (
+data class PublishUIState(
     val isLoading: Boolean = false,
     val errorMessage: String? = null,
     val successMessage: String? = null,
@@ -47,8 +44,7 @@ data class PublishUIState (
     val isbn: String = "",
     val title: String = "",
     val authorName: String = "",
-    )
-
+)
 
 class PublishViewModel(application: Application) : AndroidViewModel(application) {
     private val TAG = "PublishViewModel"
@@ -61,7 +57,6 @@ class PublishViewModel(application: Application) : AndroidViewModel(application)
     var title by mutableStateOf("")
     var authorName by mutableStateOf("")
     var selectedImageUri by mutableStateOf<Uri?>(null)
-
 
     fun handleImageSelected(uri: Uri) {
         selectedImageUri = uri
@@ -78,7 +73,6 @@ class PublishViewModel(application: Application) : AndroidViewModel(application)
         }
     }
 
-
     fun publishBook() {
         val validationError = validateForm()
         if (validationError != null) {
@@ -91,18 +85,16 @@ class PublishViewModel(application: Application) : AndroidViewModel(application)
                 isLoading = true
             )
 
-
             val start = System.currentTimeMillis()
-
             Log.d(TAG, "Starting image upload")
 
-            val imageKey = selectedImageUri?.let {uri ->
+            val imageKey = selectedImageUri?.let { uri ->
                 try {
-                    "${UUID.randomUUID()}.jpg".also {key ->
+                    "${UUID.randomUUID()}.jpg".also { key ->
                         uploadImage(key, uri)
-                        Log.d(TAG, "Uploaded Image successfully")}
-                }
-                catch (e: Exception) {
+                        Log.d(TAG, "Uploaded Image successfully")
+                    }
+                } catch (e: Exception) {
                     Log.w(TAG, "Failed to upload image", e)
                     null
                 }
@@ -124,8 +116,33 @@ class PublishViewModel(application: Application) : AndroidViewModel(application)
                     imageKey?.let { thumbnail(it) }
                 }.build()
 
-                Amplify.API.mutate(ModelMutation.create(book))
+                val createBookResult = Amplify.API.mutate(ModelMutation.create(book))
+                if (createBookResult.hasErrors()) {
+                    throw Exception("Error creating book: ${createBookResult.errors.first().message}")
+                }
+
                 Log.d(TAG, "Successfully created book: ${book.title}")
+
+                // Create notification about the new book
+                try {
+                    val notification = Notification.builder()
+                        .title("New Book Available")
+                        .body("\"${book.title}\" by ${authorEntity.name} is now available!")
+                        .recipient("*") // Broadcast to all users
+                        .read(false)
+                        .type(NotificationType.NEW_BOOK)
+                        .build()
+
+                    val createNotificationResult = Amplify.API.mutate(ModelMutation.create(notification))
+                    if (createNotificationResult.hasErrors()) {
+                        Log.e(TAG, "Error creating notification: ${createNotificationResult.errors.first().message}")
+                    } else {
+                        Log.d(TAG, "Created notification about new book")
+                    }
+                } catch (e: Exception) {
+                    // Just log the error - don't fail the book creation
+                    Log.e(TAG, "Failed to create notification", e)
+                }
 
                 BookyoAnalytics.trackApiCall(
                     endpoint = "createBook",
@@ -133,10 +150,14 @@ class PublishViewModel(application: Application) : AndroidViewModel(application)
                     durationMs = System.currentTimeMillis() - start
                 )
 
-
+                _uiState.value = _uiState.value.copy(
+                    isLoading = false,
+                    publishState = PublishState.SUCCESS,
+                    successMessage = "Book published successfully!"
+                )
 
             } catch (e: Exception) {
-                Log.d(TAG, "Failed to create book")
+                Log.e(TAG, "Failed to create book", e)
                 BookyoAnalytics.trackApiCall(
                     endpoint = "createBook",
                     isSuccess = false,
@@ -145,13 +166,12 @@ class PublishViewModel(application: Application) : AndroidViewModel(application)
                     errorMessage = e.message
                 )
 
-            } finally {
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    publishState = PublishState.SUCCESS
+                    publishState = PublishState.ERROR,
+                    errorMessage = "Failed to publish book: ${e.message}"
                 )
             }
-
         }
     }
 
@@ -161,21 +181,22 @@ class PublishViewModel(application: Application) : AndroidViewModel(application)
                 ModelQuery.list(Author::class.java, Author.NAME.eq(name))
             )
 
-            return res.data.items.firstOrNull()?.let {
-                author ->
+            if (res.hasErrors()) {
+                throw Exception("Error querying authors: ${res.errors.first().message}")
+            }
+
+            return res.data.items.firstOrNull()?.let { author ->
                 Log.d(TAG, "Found author $name")
                 author
             }
         } catch (e: Exception) {
-            Log.d(TAG, "Failed to check author")
-            throw Exception("Failed to check author $name")
+            Log.e(TAG, "Failed to check author", e)
+            throw Exception("Failed to check author $name: ${e.message}")
         }
     }
 
-
-
-    @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
-    private suspend fun uploadImage(key: String, uri: Uri): StorageUploadFileResult {
+    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
+    private suspend fun uploadImage(key: String, uri: Uri): String {
         return try {
             val contentResolver = getApplication<Application>().contentResolver
 
@@ -196,16 +217,15 @@ class PublishViewModel(application: Application) : AndroidViewModel(application)
             )
 
             val result = upload.result()
-
             tempFile.delete()
 
-            result
+            Log.d(TAG, "Successfully uploaded image: $key")
+            key
         } catch (e: Exception) {
             Log.e(TAG, "Upload failed", e)
             throw Exception("Failed to upload image: ${e.message}")
         }
     }
-
 
     private fun setErrorState(errorMessage: String) {
         _uiState.value = _uiState.value.copy(
