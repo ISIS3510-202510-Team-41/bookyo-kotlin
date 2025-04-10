@@ -14,6 +14,7 @@ import com.amplifyframework.datastore.generated.model.User
 import com.amplifyframework.datastore.generated.model.UserLibrary
 import com.amplifyframework.datastore.generated.model.Wishlist
 import com.amplifyframework.kotlin.core.Amplify
+import com.bookyo.BookyoApp
 import com.bookyo.auth.AmplifyAuthManager
 import kotlinx.coroutines.launch
 
@@ -117,6 +118,10 @@ class SignUpViewModel(
                             Amplify.API.mutate(ModelMutation.create(wishlist))
                             Log.d("SignUpViewModel", "Created wishlist")
 
+
+                            currentState = SignUpState.Success
+                            onConfirmationSuccess()
+
                             currentState = SignUpState.Success
                             Log.d(
                                 "SignUpViewModel",
@@ -128,6 +133,22 @@ class SignUpViewModel(
                             currentState = SignUpState.Error("Failed to setup user account")
                         }
                     }.onFailure { error ->
+
+                        if (error is com.amplifyframework.auth.cognito.exceptions.invalidstate.SignedInException) {
+                            // Sign out first and retry
+                            authManager.signOut().onSuccess {
+                                // Try again after sign out
+                                authManager.signIn(email, password).onSuccess { authUser ->
+                                    // Success handling
+                                }.onFailure { innerError ->
+                                    Log.e("SignUpViewModel", "Sign in failed after sign out", innerError)
+                                    currentState = SignUpState.Error("Failed to sign in after confirmation")
+                                }
+                            }
+                        } else {
+                            Log.e("SignUpViewModel", "Sign in failed after confirmation", error)
+                            currentState = SignUpState.Error("Failed to sign in after confirmation")
+                        }
                         Log.e("SignUpViewModel", "Sign in failed after confirmation", error)
                         currentState =
                             SignUpState.Error("Failed to sign in after confirmation")

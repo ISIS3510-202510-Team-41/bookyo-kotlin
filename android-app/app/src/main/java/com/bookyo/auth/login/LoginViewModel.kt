@@ -28,9 +28,9 @@ class LoginViewModel(
     }
 
     fun login(onSuccess: () -> Unit) {
-
-        errorMessage = validateLoginInput()
-        if (errorMessage!!.isEmpty()) {
+        val error = validateLoginInput()
+        if (error != null) {
+            errorMessage = error
             return
         }
 
@@ -40,7 +40,8 @@ class LoginViewModel(
 
             authManager.signIn(email, password).onSuccess {
                 isLoading = false
-                onSuccess
+
+                onSuccess()
             }.onFailure {
                 isLoading = false
                 errorMessage = it.localizedMessage ?: "Login Failed"

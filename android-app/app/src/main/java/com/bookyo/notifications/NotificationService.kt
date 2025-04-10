@@ -62,19 +62,28 @@ class NotificationService(private val application: Application) {
      * Start the notification service
      */
     fun start() {
+        // If already running, don't start again
+        if (pollingTimer != null) {
+            Log.d(TAG, "Notification service already running")
+            return
+        }
+
         Log.d(TAG, "Starting notification service")
 
-        // Check for current user
         serviceScope.launch {
             try {
                 currentUser = Amplify.Auth.getCurrentUser()
                 Log.d(TAG, "Current user: ${currentUser?.username}")
 
-                // Start polling for notifications
-                startPolling()
+                if (currentUser != null) {
+                    // Start polling for notifications
+                    startPolling()
 
-                // Set up subscription if possible
-                setupSubscription()
+                    // Set up subscription if possible
+                    setupSubscription()
+                } else {
+                    Log.w(TAG, "Cannot start notification service - no current user")
+                }
             } catch (e: Exception) {
                 Log.e(TAG, "Error starting notification service", e)
             }

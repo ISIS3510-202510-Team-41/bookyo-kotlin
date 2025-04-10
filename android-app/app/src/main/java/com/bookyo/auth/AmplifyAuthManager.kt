@@ -120,40 +120,30 @@ class AmplifyAuthManager {
         currentUser
     }.onFailure { exception ->
         when (exception) {
-            is AuthException -> {
-                when (exception.cause) {
-                    is SignedInException -> {
-                        signOutAndRetry(email, password)
-                    }
-
-                    is NotAuthorizedException -> {
-                        Log.w(TAG, "$AUTH_SIGNIN: Invalid credentials for email: ${email.masked()}")
-                    }
-
-                    is UserNotConfirmedException -> {
-                        Log.w(TAG, "$AUTH_SIGNIN: User not confirmed: ${email.masked()}")
-                    }
-
-                    is UserNotFoundException -> {
-                        Log.w(TAG, "$AUTH_SIGNIN: User not found: ${email.masked()}")
-                    }
-
-                    is TooManyRequestsException -> {
-                        Log.w(
-                            TAG,
-                            "$AUTH_SIGNIN: Too many attempts. Please try again later: ${email.masked()}"
-                        )
-                    }
-
-                    else -> {
-                        Log.e(
-                            TAG,
-                            "$AUTH_SIGNIN: Auth error during signin: ${exception.cause?.message}",
-                            exception
-                        )
-                    }
+                is SignedInException -> {
+                    Log.e(TAG, "$AUTH_SIGNIN: Current user: ${Amplify.Auth.getCurrentUser()}")
+                    return signOutAndRetry(email, password)
                 }
-            }
+
+                is NotAuthorizedException -> {
+                    Log.w(TAG, "$AUTH_SIGNIN: Invalid credentials for email: ${email.masked()}")
+                }
+
+                is UserNotConfirmedException -> {
+                    Log.w(TAG, "$AUTH_SIGNIN: User not confirmed: ${email.masked()}")
+                }
+
+                is UserNotFoundException -> {
+                    Log.w(TAG, "$AUTH_SIGNIN: User not found: ${email.masked()}")
+                }
+
+                is TooManyRequestsException -> {
+                    Log.w(
+                        TAG,
+                        "$AUTH_SIGNIN: Too many attempts. Please try again later: ${email.masked()}"
+                    )
+                }
+
 
             else -> {
                 Log.e(
@@ -171,11 +161,10 @@ class AmplifyAuthManager {
         }
     }
 
-    private suspend fun signOutAndRetry(
-        email: String, password: String
-    ) {
-        signOut()
-        signIn(email, password)
+    private suspend fun signOutAndRetry(email: String, password: String): Result<AuthUser> {
+        signOut().getOrThrow()
+
+        return signIn(email, password)
     }
 
     suspend fun resendSignUpCode(
