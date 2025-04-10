@@ -79,7 +79,7 @@ class PublishViewModel(application: Application) : AndroidViewModel(application)
     }
 
 
-    fun publishBook(onPublishSuccess: () -> Unit) {
+    fun publishBook() {
         val validationError = validateForm()
         if (validationError != null) {
             setErrorState(validationError)
