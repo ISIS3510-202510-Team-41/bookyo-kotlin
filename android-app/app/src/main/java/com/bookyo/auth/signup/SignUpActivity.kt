@@ -243,7 +243,6 @@ class SignUpActivity: AuthBaseActivity() {
 
     @Composable
     fun ConfirmationForm(viewModel: SignUpViewModel, onConfirmationSuccess: () -> Unit) {
-        // Keeping the confirmation screen as is
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -254,6 +253,7 @@ class SignUpActivity: AuthBaseActivity() {
 
             Text(
                 text = "Confirm Your Email",
+                color = MaterialTheme.colorScheme.onSurface,
                 style = MaterialTheme.typography.displayMedium
             )
 
@@ -263,6 +263,7 @@ class SignUpActivity: AuthBaseActivity() {
                 text = "We've sent a confirmation code to ${viewModel.email}",
                 style = MaterialTheme.typography.bodyLarge,
                 textAlign = TextAlign.Center,
+                color = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier.padding(horizontal = 32.dp)
             )
 
