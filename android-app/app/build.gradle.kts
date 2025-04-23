@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+
 }
 
 android {
@@ -52,6 +53,7 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation(libs.firebase.storage.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -82,5 +84,10 @@ dependencies {
     implementation("com.amplifyframework:core:2.24.0")
     implementation("com.amplifyframework:aws-core:2.24.0")
     implementation("com.amplifyframework:aws-storage-s3:2.24.0")
+
+    implementation("io.coil-kt:coil-compose:2.4.0")
+    //implementation("com.google.accompanist:accompanist-glide:0.23.0")
+    implementation ("com.github.bumptech.glide:compose:1.0.0-beta01")
+
 
 }

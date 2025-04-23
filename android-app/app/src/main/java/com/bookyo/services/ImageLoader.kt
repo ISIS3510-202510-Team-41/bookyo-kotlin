@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.security.MessageDigest
+import com.bumptech.glide.Glide
 
 
 class ImageLoader(private val context: Context) {
@@ -23,59 +24,33 @@ class ImageLoader(private val context: Context) {
     suspend fun loadImage(key: String): Flow<ImageLoadingState> = flow {
         emit(ImageLoadingState.Loading)
 
+        try {
             // Download from S3
-            var tempFile = File(context.cacheDir, "images/$key")
-            val dl = Amplify.Storage.downloadFile(StoragePath.fromString("images/$key"), tempFile)
-            val file = dl.result().file
+            val tempFile = File(context.cacheDir, "images/$key")
+            val download = Amplify.Storage.downloadFile(StoragePath.fromString("images/$key"), tempFile)
+            val file = download.result().file
 
-
-            // Decode and optimize bitmap
+            // Load bitmap with Glide
             val bitmap = withContext(Dispatchers.IO) {
-                val options = BitmapFactory.Options().apply {
-                    inJustDecodeBounds = true
-                }
-                BitmapFactory.decodeFile(file.path, options)
-
-                options.inSampleSize = calculateInSampleSize(options, 300, 300)
-                options.inJustDecodeBounds = false
-
-                BitmapFactory.decodeFile(file.path, options)
+                Glide.with(context)
+                    .asBitmap()
+                    .load(file)
+                    .submit()
+                    .get()
             }
 
-            // Clean up file
-            file.delete()
-
+            file.delete() // opcional
             emit(ImageLoadingState.Success(bitmap))
-    }
-
-    private fun calculateInSampleSize(
-        options: BitmapFactory.Options, reqWidth: Int, reqHeight: Int
-    ): Int {
-        val (height: Int, width: Int) = options.run { outHeight to outWidth }
-        var inSampleSize = 1
-
-        if (height > reqHeight || width > reqWidth) {
-            val halfHeight: Int = height / 2
-            val halfWidth: Int = width / 2
-
-            while (halfHeight / inSampleSize >= reqHeight && halfWidth / inSampleSize >= reqWidth) {
-                inSampleSize *= 2
-            }
+        } catch (e: Exception) {
+            emit(ImageLoadingState.Error(e))
         }
-
-        return inSampleSize
     }
-
-    private fun String.hashKey(): String {
-        return MessageDigest.getInstance("MD5").digest(toByteArray())
-            .joinToString("") { "%02x".format(it) }
-    }
-}
 
 sealed class ImageLoadingState {
     object Loading : ImageLoadingState()
     data class Success(val bitmap: Bitmap) : ImageLoadingState()
     data class Error(val exception: Exception) : ImageLoadingState()
+}
 }
 
 @Composable
