@@ -29,6 +29,11 @@ import com.bookyo.components.BottomNavigationBar
 import com.bookyo.ui.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.tooling.preview.PreviewParameterProvider
+import com.amplifyframework.core.model.ModelReference
+import com.amplifyframework.datastore.generated.model.Author
 import com.bookyo.R
 import com.bookyo.components.Navigation
 import com.bookyo.components.rememberToastState
@@ -113,7 +118,7 @@ fun HomeScreen(viewModel: HomeViewModel, onPublishClick: () -> Unit) {
         // Contenedor de los espacios 1 y 2
         Column(
             modifier = Modifier
-                .fillMaxWidth(),
+                .fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
@@ -124,7 +129,7 @@ fun HomeScreen(viewModel: HomeViewModel, onPublishClick: () -> Unit) {
                 Box(
                     modifier = Modifier
                         .size(300.dp, 170.dp)
-                        .background(whiteGray)
+                        .background(white)
                 ) {
                     LazyRow(
                         modifier = Modifier
@@ -177,7 +182,7 @@ fun HomeScreen(viewModel: HomeViewModel, onPublishClick: () -> Unit) {
                 Spacer(modifier = Modifier.height(8.dp))
                 BookyoButton(
                     onClick = { /* Acción para explorar libros */ },
-                    modifier = Modifier.fillMaxWidth(0.8f), // Ajustar tamaño del botón
+                    modifier = Modifier.fillMaxWidth(0.5f), // Ajustar tamaño del botón
                     text = "Browse Books"
                 )
 
@@ -190,14 +195,14 @@ fun HomeScreen(viewModel: HomeViewModel, onPublishClick: () -> Unit) {
                         Box(
                             modifier = Modifier
                                 .size(300.dp, 170.dp)
-                                .background(whiteGray)
+                                .background(white)
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         BookyoButton(
                             onClick = {
                                 onPublishClick()
                                       },
-                            modifier = Modifier.fillMaxWidth(0.8f),
+                            modifier = Modifier.fillMaxWidth(0.5f),
                             text = "Publish Book"
                         )
                     }
@@ -214,7 +219,7 @@ fun BookCard(
         modifier = modifier
             .fillMaxWidth()
             .heightIn(min = 300.dp), colors = CardDefaults.cardColors(
-            containerColor = whiteGray,
+            containerColor = white,
         ), elevation = CardDefaults.cardElevation(
             defaultElevation = 2.dp, pressedElevation = 4.dp
         )
@@ -231,5 +236,12 @@ fun BookCard(
     }
 }
 
+@Preview(showBackground = true, widthDp = 360, heightDp = 640)
+@Composable
+fun HomeScreenPreview() {
+    val mockViewModel = HomeViewModel()
 
-
+    BookyoTheme {
+        HomeScreen(mockViewModel, { /* Acción de ejemplo */ })
+    }
+}
