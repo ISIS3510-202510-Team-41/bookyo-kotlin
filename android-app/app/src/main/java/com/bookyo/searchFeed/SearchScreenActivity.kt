@@ -41,7 +41,7 @@ class SearchScreenActivity: ComponentActivity() {
 @Composable
 fun SearchScreen(viewModel: SearchScreenViewModel) {
     val toastState = rememberToastState()
-    val currentScreenIndex = Navigation.getSelectedIndexForActivity(HomeScreenActivity::class.java)
+    val currentScreenIndex = Navigation.getSelectedIndexForActivity(SearchScreenActivity::class.java)
 
     var selectedTabIndex by remember { mutableStateOf(0) }
     val tabTitles = listOf("Listings", "Books")
