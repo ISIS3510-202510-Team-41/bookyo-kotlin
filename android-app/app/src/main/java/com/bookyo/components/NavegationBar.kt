@@ -4,7 +4,9 @@ import android.content.Context
 import android.content.Intent
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -13,7 +15,12 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.Badge
+import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -21,7 +28,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -33,10 +42,13 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.bookyo.BookyoApp
 import com.bookyo.R
 import com.bookyo.home.HomeScreenActivity
 import com.bookyo.notifications.NotificationsScreenActivity
+import com.bookyo.profile.ProfileScreenActivity
 import com.bookyo.publish.PublishScreenActivity
+import com.bookyo.searchFeed.SearchScreenActivity
 
 object Navigation {
     enum class Destination(val index: Int) {
@@ -51,10 +63,10 @@ object Navigation {
         // Get the target activity class
         val targetClass = when(destination) {
             Destination.HOME -> HomeScreenActivity::class.java
-            Destination.BROWSE -> return // Not implemented yet
+            Destination.BROWSE -> SearchScreenActivity::class.java
             Destination.PUBLISH -> PublishScreenActivity::class.java
             Destination.NOTIFICATIONS -> NotificationsScreenActivity::class.java
-            Destination.PROFILE -> return // Not implemented yet
+            Destination.PROFILE -> ProfileScreenActivity::class.java
         }
 
         // Check if we're already in the target activity class
@@ -96,6 +108,12 @@ fun BottomNavigationBar(
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
+    val app = context.applicationContext as? BookyoApp
+
+    // Get unread notifications count if available
+    val unreadCount by app?.notificationService?.unreadCount?.collectAsState() ?: remember {
+        mutableIntStateOf(0)
+    }
 
     // Always start expanded
     val isExpanded = remember { mutableStateOf(true) }
@@ -169,14 +187,40 @@ fun BottomNavigationBar(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Center
                     ) {
-                        Icon(
-                            painter = painterResource(id = iconResources[index]),
-                            contentDescription = item,
-                            tint = if (currentScreenIndex == index)
-                                MaterialTheme.colorScheme.tertiary
-                            else
-                                MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
-                        )
+                        // Show badge for notifications if there are unread notifications
+                        if (index == Navigation.Destination.NOTIFICATIONS.index && unreadCount > 0) {
+                            BadgedBox(
+                                badge = {
+                                    Badge(
+                                        containerColor = MaterialTheme.colorScheme.error,
+                                        contentColor = MaterialTheme.colorScheme.onError
+                                    ) {
+                                        Text(
+                                            text = if (unreadCount > 99) "99+" else unreadCount.toString(),
+                                            fontSize = 10.sp
+                                        )
+                                    }
+                                }
+                            ) {
+                                Icon(
+                                    painter = painterResource(id = iconResources[index]),
+                                    contentDescription = item,
+                                    tint = if (currentScreenIndex == index)
+                                        MaterialTheme.colorScheme.tertiary
+                                    else
+                                        MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
+                                )
+                            }
+                        } else {
+                            Icon(
+                                painter = painterResource(id = iconResources[index]),
+                                contentDescription = item,
+                                tint = if (currentScreenIndex == index)
+                                    MaterialTheme.colorScheme.tertiary
+                                else
+                                    MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
+                            )
+                        }
                     }
                 }
             }

@@ -17,6 +17,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -29,13 +30,14 @@ import com.bookyo.components.BottomNavigationBar
 import com.bookyo.ui.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.Preview
 import com.bookyo.R
 import com.bookyo.components.Navigation
 import com.bookyo.components.rememberToastState
 import com.amplifyframework.datastore.generated.model.Book
 import com.bookyo.components.BookThumbnail
-import com.bookyo.publish.PublishScreen
 import com.bookyo.publish.PublishScreenActivity
+import com.bookyo.searchFeed.SearchScreenActivity
 
 class HomeScreenActivity: ComponentActivity() {
 
@@ -49,6 +51,8 @@ class HomeScreenActivity: ComponentActivity() {
             BookyoTheme {
                 HomeScreen(viewModel, onPublishClick = {
                     startActivity(Intent(this, PublishScreenActivity::class.java))
+                }, onSearchClick = {
+                    startActivity(Intent(this, SearchScreenActivity::class.java))
                 })
             }
         }
@@ -57,7 +61,7 @@ class HomeScreenActivity: ComponentActivity() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen(viewModel: HomeViewModel, onPublishClick: () -> Unit) {
+fun HomeScreen(viewModel: HomeViewModel, onSearchClick: () -> Unit, onPublishClick: () -> Unit) {
 
     // Collect books as state
     val books by viewModel.books.collectAsState()
@@ -84,7 +88,7 @@ fun HomeScreen(viewModel: HomeViewModel, onPublishClick: () -> Unit) {
                         onClick = {
                             // Shopping cart action
                             toastState.showInfo("Shopping cart not implemented yet") }) {
-                        androidx.compose.material3.Icon(
+                        Icon(
                             painter = painterResource(id = R.drawable.ic_shopping_cart),
                             contentDescription = "Shopping Cart",
                             tint = MaterialTheme.colorScheme.onSurface
@@ -113,7 +117,7 @@ fun HomeScreen(viewModel: HomeViewModel, onPublishClick: () -> Unit) {
         // Contenedor de los espacios 1 y 2
         Column(
             modifier = Modifier
-                .fillMaxWidth(),
+                .fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
@@ -124,7 +128,7 @@ fun HomeScreen(viewModel: HomeViewModel, onPublishClick: () -> Unit) {
                 Box(
                     modifier = Modifier
                         .size(300.dp, 170.dp)
-                        .background(whiteGray)
+                        .background(white)
                 ) {
                     LazyRow(
                         modifier = Modifier
@@ -176,12 +180,12 @@ fun HomeScreen(viewModel: HomeViewModel, onPublishClick: () -> Unit) {
                 }
                 Spacer(modifier = Modifier.height(8.dp))
                 BookyoButton(
-                    onClick = { /* Acción para explorar libros */ },
-                    modifier = Modifier.fillMaxWidth(0.8f), // Ajustar tamaño del botón
+                    onClick = { onSearchClick() },
+                    modifier = Modifier.fillMaxWidth(0.5f),
                     text = "Browse Books"
                 )
 
-                    Spacer(modifier = Modifier.height(40.dp)) // Space between elements
+                    Spacer(modifier = Modifier.height(40.dp))
 
                     // Space 2 - Image + Button
                     Column(
@@ -190,14 +194,14 @@ fun HomeScreen(viewModel: HomeViewModel, onPublishClick: () -> Unit) {
                         Box(
                             modifier = Modifier
                                 .size(300.dp, 170.dp)
-                                .background(whiteGray)
+                                .background(white)
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         BookyoButton(
                             onClick = {
                                 onPublishClick()
                                       },
-                            modifier = Modifier.fillMaxWidth(0.8f),
+                            modifier = Modifier.fillMaxWidth(0.5f),
                             text = "Publish Book"
                         )
                     }
@@ -214,7 +218,7 @@ fun BookCard(
         modifier = modifier
             .fillMaxWidth()
             .heightIn(min = 300.dp), colors = CardDefaults.cardColors(
-            containerColor = whiteGray,
+            containerColor = white,
         ), elevation = CardDefaults.cardElevation(
             defaultElevation = 2.dp, pressedElevation = 4.dp
         )
@@ -231,5 +235,15 @@ fun BookCard(
     }
 }
 
+@Preview(showBackground = true, widthDp = 360, heightDp = 640)
+@Composable
+fun HomeScreenPreview() {
+    val mockViewModel = HomeViewModel()
 
-
+    BookyoTheme {
+        HomeScreen(
+            mockViewModel,
+            onSearchClick = TODO()
+        ) { /* Acción de ejemplo */ }
+    }
+}

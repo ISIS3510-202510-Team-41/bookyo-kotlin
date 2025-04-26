@@ -31,6 +31,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.bookyo.BookyoApp
 import com.bookyo.auth.AuthBaseActivity
 import com.bookyo.components.BookyoButton
 import com.bookyo.components.BookyoTextField
@@ -51,17 +52,25 @@ class SignUpActivity: AuthBaseActivity() {
             BookyoTheme {
                 SignUpFlow(
                     viewModel = viewModel,
-                    onSignUpSuccess = {
-                        val intent = Intent(this, HomeScreenActivity::class.java).apply {
-                            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                        }
-                        startActivity(intent)
-                        finish()
-                    }
+                    onSignUpSuccess = { onSignupSuccess() }
                 )
             }
         }
     }
+
+    private fun onSignupSuccess() {
+        // Start notification service after successful signup
+        (applicationContext as? BookyoApp)?.startNotificationService()
+
+        // Navigate to home screen
+        val intent = Intent(this, HomeScreenActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        }
+        startActivity(intent)
+        finish()
+    }
+
+
 
     @Composable
     private fun SignUpFlow(
@@ -243,7 +252,6 @@ class SignUpActivity: AuthBaseActivity() {
 
     @Composable
     fun ConfirmationForm(viewModel: SignUpViewModel, onConfirmationSuccess: () -> Unit) {
-        // Keeping the confirmation screen as is
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -254,6 +262,7 @@ class SignUpActivity: AuthBaseActivity() {
 
             Text(
                 text = "Confirm Your Email",
+                color = MaterialTheme.colorScheme.onSurface,
                 style = MaterialTheme.typography.displayMedium
             )
 
@@ -263,6 +272,7 @@ class SignUpActivity: AuthBaseActivity() {
                 text = "We've sent a confirmation code to ${viewModel.email}",
                 style = MaterialTheme.typography.bodyLarge,
                 textAlign = TextAlign.Center,
+                color = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier.padding(horizontal = 32.dp)
             )
 
