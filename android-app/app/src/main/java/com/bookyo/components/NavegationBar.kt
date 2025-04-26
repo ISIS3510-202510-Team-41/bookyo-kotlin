@@ -48,6 +48,7 @@ import com.bookyo.home.HomeScreenActivity
 import com.bookyo.notifications.NotificationsScreenActivity
 import com.bookyo.profile.ProfileScreenActivity
 import com.bookyo.publish.PublishScreenActivity
+import com.bookyo.searchFeed.SearchScreenActivity
 
 object Navigation {
     enum class Destination(val index: Int) {
@@ -62,7 +63,7 @@ object Navigation {
         // Get the target activity class
         val targetClass = when(destination) {
             Destination.HOME -> HomeScreenActivity::class.java
-            Destination.BROWSE -> return // Not implemented yet
+            Destination.BROWSE -> SearchScreenActivity::class.java
             Destination.PUBLISH -> PublishScreenActivity::class.java
             Destination.NOTIFICATIONS -> NotificationsScreenActivity::class.java
             Destination.PROFILE -> ProfileScreenActivity::class.java
