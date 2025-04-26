@@ -17,6 +17,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -30,17 +31,13 @@ import com.bookyo.ui.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.tooling.preview.PreviewParameter
-import androidx.compose.ui.tooling.preview.PreviewParameterProvider
-import com.amplifyframework.core.model.ModelReference
-import com.amplifyframework.datastore.generated.model.Author
 import com.bookyo.R
 import com.bookyo.components.Navigation
 import com.bookyo.components.rememberToastState
 import com.amplifyframework.datastore.generated.model.Book
 import com.bookyo.components.BookThumbnail
-import com.bookyo.publish.PublishScreen
 import com.bookyo.publish.PublishScreenActivity
+import com.bookyo.searchFeed.SearchScreenActivity
 
 class HomeScreenActivity: ComponentActivity() {
 
@@ -54,6 +51,8 @@ class HomeScreenActivity: ComponentActivity() {
             BookyoTheme {
                 HomeScreen(viewModel, onPublishClick = {
                     startActivity(Intent(this, PublishScreenActivity::class.java))
+                }, onSearchClick = {
+                    startActivity(Intent(this, SearchScreenActivity::class.java))
                 })
             }
         }
@@ -62,7 +61,7 @@ class HomeScreenActivity: ComponentActivity() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen(viewModel: HomeViewModel, onPublishClick: () -> Unit) {
+fun HomeScreen(viewModel: HomeViewModel, onSearchClick: () -> Unit, onPublishClick: () -> Unit) {
 
     // Collect books as state
     val books by viewModel.books.collectAsState()
@@ -89,7 +88,7 @@ fun HomeScreen(viewModel: HomeViewModel, onPublishClick: () -> Unit) {
                         onClick = {
                             // Shopping cart action
                             toastState.showInfo("Shopping cart not implemented yet") }) {
-                        androidx.compose.material3.Icon(
+                        Icon(
                             painter = painterResource(id = R.drawable.ic_shopping_cart),
                             contentDescription = "Shopping Cart",
                             tint = MaterialTheme.colorScheme.onSurface
@@ -181,12 +180,12 @@ fun HomeScreen(viewModel: HomeViewModel, onPublishClick: () -> Unit) {
                 }
                 Spacer(modifier = Modifier.height(8.dp))
                 BookyoButton(
-                    onClick = { /* Acción para explorar libros */ },
-                    modifier = Modifier.fillMaxWidth(0.5f), // Ajustar tamaño del botón
+                    onClick = { onSearchClick() },
+                    modifier = Modifier.fillMaxWidth(0.5f),
                     text = "Browse Books"
                 )
 
-                    Spacer(modifier = Modifier.height(40.dp)) // Space between elements
+                    Spacer(modifier = Modifier.height(40.dp))
 
                     // Space 2 - Image + Button
                     Column(
@@ -242,6 +241,9 @@ fun HomeScreenPreview() {
     val mockViewModel = HomeViewModel()
 
     BookyoTheme {
-        HomeScreen(mockViewModel, { /* Acción de ejemplo */ })
+        HomeScreen(
+            mockViewModel,
+            onSearchClick = TODO()
+        ) { /* Acción de ejemplo */ }
     }
 }
