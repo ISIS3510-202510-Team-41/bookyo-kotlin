@@ -58,9 +58,15 @@ class PublishViewModel(application: Application) : AndroidViewModel(application)
     var authorName by mutableStateOf("")
     var selectedImageUri by mutableStateOf<Uri?>(null)
 
-    fun handleImageSelected(uri: Uri) {
+    fun handleImageSelected(uri: Uri, isFromCamera: Boolean = false) {
         selectedImageUri = uri
-        Log.d(TAG, "Image Selected")
+        _uiState.value = _uiState.value.copy(imageUri = uri)
+        Log.d(TAG, "Image Selected from ${if (isFromCamera) "camera" else "gallery"}")
+
+        BookyoAnalytics.recordAppEvent(
+            eventName = if (isFromCamera) "image_captured" else "image_selected",
+            properties = mapOf("screen" to "publish")
+        )
     }
 
     fun validateForm(): String? {
