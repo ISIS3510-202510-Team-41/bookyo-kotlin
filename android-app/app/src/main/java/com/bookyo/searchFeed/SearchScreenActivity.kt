@@ -11,7 +11,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.wear.compose.material3.TextButtonDefaults
 import com.bookyo.R
 import com.bookyo.components.BottomNavigationBar
 import com.bookyo.home.HomeScreenActivity
