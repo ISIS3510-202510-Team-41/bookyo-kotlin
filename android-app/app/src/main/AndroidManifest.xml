@@ -72,6 +72,13 @@
             android:label="Notifications"
             />
 
+        <activity
+            android:name="com.bookyo.profile.ProfileScreenActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Bookyo"
+            android:windowSoftInputMode="adjustResize"
+            android:label="Profile"
+
 
         <!-- Search Activity -->
         <activity
