@@ -46,6 +46,7 @@ import com.bookyo.BookyoApp
 import com.bookyo.R
 import com.bookyo.home.HomeScreenActivity
 import com.bookyo.notifications.NotificationsScreenActivity
+import com.bookyo.profile.ProfileScreenActivity
 import com.bookyo.publish.PublishScreenActivity
 
 object Navigation {
@@ -64,7 +65,7 @@ object Navigation {
             Destination.BROWSE -> return // Not implemented yet
             Destination.PUBLISH -> PublishScreenActivity::class.java
             Destination.NOTIFICATIONS -> NotificationsScreenActivity::class.java
-            Destination.PROFILE -> return // Not implemented yet
+            Destination.PROFILE -> ProfileScreenActivity::class.java
         }
 
         // Check if we're already in the target activity class
