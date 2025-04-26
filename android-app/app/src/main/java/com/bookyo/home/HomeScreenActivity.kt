@@ -30,16 +30,11 @@ import com.bookyo.ui.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.tooling.preview.PreviewParameter
-import androidx.compose.ui.tooling.preview.PreviewParameterProvider
-import com.amplifyframework.core.model.ModelReference
-import com.amplifyframework.datastore.generated.model.Author
 import com.bookyo.R
 import com.bookyo.components.Navigation
 import com.bookyo.components.rememberToastState
 import com.amplifyframework.datastore.generated.model.Book
 import com.bookyo.components.BookThumbnail
-import com.bookyo.publish.PublishScreen
 import com.bookyo.publish.PublishScreenActivity
 
 class HomeScreenActivity: ComponentActivity() {
@@ -242,6 +237,6 @@ fun HomeScreenPreview() {
     val mockViewModel = HomeViewModel()
 
     BookyoTheme {
-        HomeScreen(mockViewModel, { /* Acción de ejemplo */ })
+        HomeScreen(mockViewModel) { /* Acción de ejemplo */ }
     }
 }
