@@ -70,6 +70,15 @@
             android:label="Notifications"
             />
 
+        <!-- Search Activity -->
+        <activity
+            android:name="com.bookyo.searchFeed.SearchScreenActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Bookyo"
+            android:windowSoftInputMode="adjustResize"
+            android:label="Search"
+            />
+
     </application>
 
 </manifest>
