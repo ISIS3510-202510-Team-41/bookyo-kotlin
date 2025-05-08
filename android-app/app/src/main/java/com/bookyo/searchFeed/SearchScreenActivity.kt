@@ -9,21 +9,18 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.bookyo.R
+import com.bookyo.components.BookCard
 import com.bookyo.components.BottomNavigationBar
-import com.bookyo.home.HomeScreenActivity
 import com.bookyo.components.Navigation
+import com.bookyo.components.ToastHandler
 import com.bookyo.components.rememberToastState
 import com.bookyo.ui.BookyoTheme
-import com.bookyo.ui.blue
-import androidx.compose.material3.TextButton
 import androidx.compose.ui.Alignment
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-
+import androidx.compose.foundation.lazy.rememberLazyListState
 
 class SearchScreenActivity: ComponentActivity() {
 
@@ -32,7 +29,9 @@ class SearchScreenActivity: ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            SearchScreen(viewModel)
+            BookyoTheme {
+                SearchScreen(viewModel)
+            }
         }
     }
 }
@@ -42,10 +41,11 @@ class SearchScreenActivity: ComponentActivity() {
 fun SearchScreen(viewModel: SearchScreenViewModel) {
     val toastState = rememberToastState()
     val currentScreenIndex = Navigation.getSelectedIndexForActivity(SearchScreenActivity::class.java)
+    val uiState by viewModel.uiState.collectAsState()
 
     var selectedTabIndex by remember { mutableStateOf(0) }
     val tabTitles = listOf("Listings", "Books")
-    val tabIcons = listOf(R.drawable.ic_book, R.drawable.ic_book)
+    val tabIcons = listOf(R.drawable.ic_shopping_cart, R.drawable.ic_book)
 
     Scaffold(
         topBar = {
@@ -118,53 +118,155 @@ fun SearchScreen(viewModel: SearchScreenViewModel) {
         },
         containerColor = MaterialTheme.colorScheme.surface
     ) { paddingValues ->
-
-        val listState = rememberLazyListState()
-
-        val items = if (selectedTabIndex == 0) {
-            val books = viewModel.books.collectAsState().value
-            books.map { it.title }
-        } else {
-            val listings = viewModel.listings.collectAsState().value
-            listings.map { "${it.book} - ${it.price}" }
-        }
-
-        LazyColumn(
-            state = listState,
+        Box(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .padding(horizontal = 16.dp),
-            contentPadding = PaddingValues(bottom = 100.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            items(items = items) { item ->
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(100.dp),
-                    elevation = CardDefaults.cardElevation(4.dp)
-                ) {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
+            when (uiState) {
+                is SearchScreenUIState.Loading -> {
+                    // Loading state
+                    CircularProgressIndicator(
+                        modifier = Modifier.align(Alignment.Center),
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
+
+                is SearchScreenUIState.Success -> {
+                    val successState = uiState as SearchScreenUIState.Success
+                    val listState = rememberLazyListState()
+
+                    // Check if we should display empty state
+                    val displayBooks = selectedTabIndex == 1 && successState.books.isNotEmpty()
+                    val displayListings = selectedTabIndex == 0 && successState.books.any { it.isListed } &&
+                            successState.listings != null && successState.listings.isNotEmpty()
+
+                    if (!displayBooks && !displayListings) {
+                        // Empty state for current tab
+                        Column(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(16.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            Text(
+                                text = "No ${if (selectedTabIndex == 0) "listings" else "books"} found",
+                                style = MaterialTheme.typography.bodyLarge,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    } else {
+                        // Content state - show books or listings based on selected tab
+                        LazyColumn(
+                            state = listState,
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(horizontal = 16.dp),
+                            contentPadding = PaddingValues(vertical = 16.dp),
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            if (selectedTabIndex == 0 && successState.listings != null) {
+                                // Listings tab
+                                val listedBooks = successState.books.filter { it.isListed }
+                                items(listedBooks) { book ->
+                                    // Find matching listing by ID
+                                    val listing = successState.listings.find { it.id == book.id }
+                                    if (listing != null) {
+                                        BookCard(
+                                            book = book,
+                                            listing = listing,
+                                            onClick = {
+                                                toastState.showInfo("Book details not implemented yet")
+                                            }
+                                        )
+                                    }
+                                }
+                            } else {
+                                // Books tab
+                                items(successState.books) { book ->
+                                    BookCard(
+                                        book = book,
+                                        onClick = {
+                                            toastState.showInfo("Book details not implemented yet")
+                                        }
+                                    )
+                                }
+                            }
+
+                            // Loading more indicator
+                            if (successState.isLoadingMore) {
+                                item {
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(16.dp),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        CircularProgressIndicator(
+                                            modifier = Modifier.size(24.dp),
+                                            strokeWidth = 2.dp
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                is SearchScreenUIState.Error -> {
+                    val errorState = uiState as SearchScreenUIState.Error
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(16.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
                     ) {
-                        Text(item)
+                        Text(
+                            text = when (errorState) {
+                                is SearchScreenUIState.Error.Network -> "Network error. Please check your connection."
+                                is SearchScreenUIState.Error.Generic -> errorState.message
+                            },
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.error
+                        )
+
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        Button(
+                            onClick = {
+                                when (errorState) {
+                                    is SearchScreenUIState.Error.Network -> errorState.retry()
+                                    is SearchScreenUIState.Error.Generic -> errorState.retry()
+                                }
+                            }
+                        ) {
+                            Text("Retry")
+                        }
+                    }
+                }
+
+                SearchScreenUIState.Empty -> {
+                    // Empty state
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(16.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        Text(
+                            text = "No results found",
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
                     }
                 }
             }
+
+            // Toast handler
+            ToastHandler(toastState)
         }
-    }
-}
-
-
-
-@Preview(showBackground = true, widthDp = 360, heightDp = 640)
-@Composable
-fun SearchScreenPreview() {
-    val mockViewModel = SearchScreenViewModel()
-
-    BookyoTheme {
-        SearchScreen(mockViewModel)
     }
 }

@@ -78,6 +78,7 @@
             android:theme="@style/Theme.Bookyo"
             android:windowSoftInputMode="adjustResize"
             android:label="Profile"
+            />
 
 
         <!-- Search Activity -->
