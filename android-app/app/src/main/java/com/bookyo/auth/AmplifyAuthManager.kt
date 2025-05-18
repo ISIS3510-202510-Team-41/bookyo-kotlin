@@ -223,6 +223,7 @@ class AmplifyAuthManager {
         Log.d(TAG, "$AUTH_SIGNOUT: Attempting to sign out current user")
 
         Amplify.Auth.signOut()
+
         Log.i(TAG, "$AUTH_SIGNOUT: Successfully signed out user")
 
         true

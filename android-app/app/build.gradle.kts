@@ -63,30 +63,33 @@ dependencies {
 
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.3")
 
-    implementation ("com.google.accompanist:accompanist-permissions:0.32.0")
+    implementation("com.google.accompanist:accompanist-permissions:0.32.0")
     implementation("androidx.compose.ui:ui-text-google-fonts:1.5.4")
     implementation("androidx.compose.material3:material3:1.2.0")
     implementation("androidx.compose.material:material:1.5.0")
 
     implementation("io.coil-kt.coil3:coil-compose:3.1.0")
 
-
     // Amplify dependency
     implementation("com.amplifyframework:core-kotlin:2.24.0")
-
     implementation("com.amplifyframework:aws-api:2.24.0")
     implementation("com.amplifyframework:aws-auth-cognito:2.24.0")
     implementation("com.amplifyframework:aws-analytics-pinpoint:2.24.0")
-
-
-
     implementation("com.amplifyframework:core:2.24.0")
     implementation("com.amplifyframework:aws-core:2.24.0")
     implementation("com.amplifyframework:aws-storage-s3:2.24.0")
 
+    // WorkManager for background tasks
+    implementation("androidx.work:work-runtime-ktx:2.8.1")
+
+    // DataStore for preference storage
+    implementation("androidx.datastore:datastore-preferences:1.0.0")
+
+    // Kotlin Serialization
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
+
     implementation("io.coil-kt:coil-compose:2.4.0")
-    //implementation("com.google.accompanist:accompanist-glide:0.23.0")
-    implementation ("com.github.bumptech.glide:compose:1.0.0-beta01")
+    implementation("com.github.bumptech.glide:compose:1.0.0-beta01")
 
 
 }
