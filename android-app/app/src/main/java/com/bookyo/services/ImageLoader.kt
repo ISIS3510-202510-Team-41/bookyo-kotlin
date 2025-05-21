@@ -25,6 +25,7 @@ class ImageLoader(private val context: Context) {
         emit(ImageLoadingState.Loading)
 
         try {
+
             // Download from S3
             val tempFile = File(context.cacheDir, "images/$key")
             val download = Amplify.Storage.downloadFile(StoragePath.fromString("images/$key"), tempFile)
@@ -39,7 +40,6 @@ class ImageLoader(private val context: Context) {
                     .get()
             }
 
-            file.delete() // opcional
             emit(ImageLoadingState.Success(bitmap))
         } catch (e: Exception) {
             emit(ImageLoadingState.Error(e))
