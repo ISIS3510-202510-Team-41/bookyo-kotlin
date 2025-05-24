@@ -4,7 +4,6 @@ import android.content.Context
 import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
-import android.net.NetworkRequest
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.core.content.getSystemService
@@ -17,7 +16,7 @@ import kotlinx.coroutines.launch
 /**
  * Utility class to check and monitor network connectivity
  */
-class ConnectivityChecker(private val context: Context) {
+class ConnectivityChecker(context: Context) {
 
     private val connectivityManager = context.getSystemService<ConnectivityManager>()
 

@@ -31,7 +31,6 @@ import java.util.UUID
 
 enum class PublishState {
     IDLE,
-    LOADING,
     SUCCESS,
     ERROR,
     OFFLINE
@@ -345,11 +344,11 @@ class PublishViewModel(application: Application) : AndroidViewModel(application)
                 }
             } ?: throw Exception("Failed to read image content")
 
-            val upload = Amplify.Storage.uploadFile(
+            Amplify.Storage.uploadFile(
                 StoragePath.fromString("images/$key"), tempFile
             )
 
-            val result = upload.result()
+
             tempFile.delete()
 
             Log.d(TAG, "Successfully uploaded image: $key")

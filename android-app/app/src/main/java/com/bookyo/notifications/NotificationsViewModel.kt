@@ -131,7 +131,4 @@ class NotificationsViewModel(application: Application) : AndroidViewModel(applic
         }
     }
 
-    fun getUnreadCount(): Int {
-        return _notifications.value.count { !it.read }
-    }
 }

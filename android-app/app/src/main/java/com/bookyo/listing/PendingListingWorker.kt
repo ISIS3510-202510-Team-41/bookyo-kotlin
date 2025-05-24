@@ -1,9 +1,16 @@
 package com.bookyo.listing
 
 import android.content.Context
-import android.net.Uri
 import android.util.Log
-import androidx.work.*
+import androidx.work.BackoffPolicy
+import androidx.work.Constraints
+import androidx.work.CoroutineWorker
+import androidx.work.ExistingWorkPolicy
+import androidx.work.NetworkType
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
+import androidx.work.WorkerParameters
+import androidx.work.workDataOf
 import com.bookyo.utils.ConnectivityChecker
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -207,7 +214,7 @@ class PendingListingWorker(
                 Log.d(TAG, "Failed to process listing for book ${pendingListing.bookId}, will retry later")
 
                 // Enqueue a separate worker for this specific pending listing
-                PendingListingWorker.enqueueSpecificWork(
+                enqueueSpecificWork(
                     applicationContext,
                     pendingListing.id
                 )

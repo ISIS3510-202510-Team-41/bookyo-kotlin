@@ -11,8 +11,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -20,11 +18,9 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.bookyo.R
 import com.bookyo.components.BookThumbnail
 import com.bookyo.components.BookyoButton
 import com.bookyo.components.BottomNavigationBar
@@ -34,7 +30,6 @@ import com.bookyo.listing.CreateListingActivity
 import com.bookyo.ui.BookyoTheme
 import com.bookyo.ui.blue
 import com.bookyo.ui.green
-import com.bookyo.ui.orange
 
 class BookDetailActivity : ComponentActivity() {
 

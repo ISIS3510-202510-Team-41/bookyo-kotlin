@@ -4,16 +4,12 @@ package com.bookyo.auth
 import android.util.Log
 import com.amplifyframework.auth.AuthUser
 import com.amplifyframework.kotlin.core.Amplify
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 
 class SessionManager {
     companion object {
         private const val TAG = "SessionManager"
     }
 
-    private val _authState = MutableStateFlow<AuthState>(AuthState.Unknown)
-    val authState: StateFlow<AuthState> = _authState
 
     suspend fun checkAuthSession(): AuthState {
         return try {
@@ -36,8 +32,6 @@ class SessionManager {
         } catch (e: Exception) {
             Log.e(TAG, "Error checking auth session", e)
             AuthState.SignedOut
-        }.also {
-            _authState.value = it
         }
     }
 

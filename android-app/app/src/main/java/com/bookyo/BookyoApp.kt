@@ -51,7 +51,7 @@ class BookyoApp: Application(), Configuration.Provider {
             Log.i("BookyoApp", "Initialized Amplify")
 
             // Initialize notification service
-            notificationService = NotificationService.getInstance(this)
+            notificationService = NotificationService.getInstance()
 
             // Initialize WorkManager for background tasks
             WorkManager.getInstance(this)
@@ -96,7 +96,7 @@ class BookyoApp: Application(), Configuration.Provider {
 
     override fun getWorkManagerConfiguration(): Configuration {
         return Configuration.Builder()
-            .setMinimumLoggingLevel(android.util.Log.INFO)
+            .setMinimumLoggingLevel(Log.INFO)
             .build()
     }
 }

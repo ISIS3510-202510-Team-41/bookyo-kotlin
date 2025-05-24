@@ -29,7 +29,6 @@ class AmplifyAuthManager {
         private const val AUTH_SIGNIN = "AuthSignIn"
         private const val AUTH_CONFIRM = "AuthConfirm"
         private const val AUTH_SIGNOUT = "AuthSignOut"
-        private const val AUTH_STATE = "AuthState"
     }
     @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
     suspend fun signUpWithOptions(
@@ -167,57 +166,6 @@ class AmplifyAuthManager {
         return signIn(email, password)
     }
 
-    suspend fun resendSignUpCode(
-        email: String
-    ): Result<Boolean> = runCatching {
-        Log.d(
-            TAG,
-            "$AUTH_SIGNUP: Attempting to resend confirmation code for email: ${email.masked()}"
-        )
-
-        Amplify.Auth.resendSignUpCode(email)
-        Log.i(
-            TAG,
-            "$AUTH_SIGNUP: Successfully resent confirmation code for email: ${email.masked()}"
-        )
-        true
-    }.onFailure { exception ->
-        when (exception) {
-            is AuthException -> {
-                when (exception.cause) {
-                    is LimitExceededException -> {
-                        Log.w(
-                            TAG,
-                            "$AUTH_SIGNUP: Too many code resend attempts for email: ${email.masked()}"
-                        )
-                    }
-
-                    is UserNotFoundException -> {
-                        Log.w(
-                            TAG,
-                            "$AUTH_SIGNUP: User not found when resending code: ${email.masked()}"
-                        )
-                    }
-
-                    else -> {
-                        Log.e(
-                            TAG,
-                            "$AUTH_SIGNUP: Auth error during code resend: ${exception.cause?.message}",
-                            exception
-                        )
-                    }
-                }
-            }
-
-            else -> {
-                Log.e(
-                    TAG,
-                    "$AUTH_SIGNUP: Unexpected error during code resend for email: ${email.masked()}",
-                    exception
-                )
-            }
-        }
-    }
 
     suspend fun signOut(): Result<Boolean> = runCatching {
         Log.d(TAG, "$AUTH_SIGNOUT: Attempting to sign out current user")
@@ -231,18 +179,6 @@ class AmplifyAuthManager {
         Log.e(TAG, "$AUTH_SIGNOUT: Error during sign out", exception)
     }
 
-    fun observeAuthState(): Flow<AuthState> = flow {
-        Log.d(TAG, "$AUTH_STATE: Starting auth state observation")
-
-        try {
-            val currentUser = Amplify.Auth.getCurrentUser()
-            Log.d(TAG, "$AUTH_STATE: Current user found: ${currentUser.username.masked()}")
-            emit(AuthState.SignedIn(currentUser))
-        } catch (e: Exception) {
-            Log.d(TAG, "$AUTH_STATE: No authenticated user found")
-            emit(AuthState.SignedOut)
-        }
-    }
 
     @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
     private fun logAuthError(
@@ -292,10 +228,6 @@ class AmplifyAuthManager {
         }
     }
 
-    sealed class AuthState {
-        data class SignedIn(val user: AuthUser) : AuthState()
-        object SignedOut : AuthState()
-    }
 }
 
 // Extension function to mask sensitive data in logs
