@@ -1,6 +1,14 @@
 package com.bookyo.searchFeed
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -11,11 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.amplifyframework.datastore.generated.model.Book
 import com.bookyo.components.BookThumbnail
-import com.bookyo.searchFeed.AuthorUIModel
-import com.bookyo.searchFeed.BookUIModel
-import com.bookyo.searchFeed.ListingUIModel
 import com.bookyo.ui.white
 
 /**
@@ -119,7 +123,7 @@ fun BookCard(
                         // Price
                         // The price is a Float in the model
                         Text(
-                            text = "${String.format("%.2f", listing.price)}",
+                            text = String.format("%.2f", listing.price),
                             style = MaterialTheme.typography.titleSmall,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.primary

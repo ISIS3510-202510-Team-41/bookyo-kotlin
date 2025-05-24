@@ -44,7 +44,7 @@ fun SearchScreen(viewModel: SearchScreenViewModel) {
     val uiState by viewModel.uiState.collectAsState()
     val context = androidx.compose.ui.platform.LocalContext.current
 
-    var selectedTabIndex by remember { mutableStateOf(0) }
+    var selectedTabIndex by remember { mutableIntStateOf(0) }
     val tabTitles = listOf("Listings", "Books")
     val tabIcons = listOf(R.drawable.ic_shopping_cart, R.drawable.ic_book)
 

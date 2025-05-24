@@ -68,7 +68,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -90,7 +89,6 @@ import com.bookyo.home.HomeScreenActivity
 import com.bookyo.ui.BookyoTheme
 import com.bookyo.ui.lightGray
 import com.bookyo.ui.orange
-import com.bookyo.ui.red
 import com.bookyo.ui.whiteGray
 import java.io.File
 import java.text.SimpleDateFormat

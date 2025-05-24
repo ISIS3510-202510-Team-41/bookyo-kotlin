@@ -14,7 +14,6 @@ import com.amplifyframework.datastore.generated.model.User
 import com.amplifyframework.datastore.generated.model.UserLibrary
 import com.amplifyframework.datastore.generated.model.Wishlist
 import com.amplifyframework.kotlin.core.Amplify
-import com.bookyo.BookyoApp
 import com.bookyo.auth.AmplifyAuthManager
 import kotlinx.coroutines.launch
 
@@ -163,10 +162,5 @@ class SignUpViewModel(
                 currentState = SignUpState.Error(e.localizedMessage ?: "Confirmation failed")
             }
         }
-    }
-
-
-    fun resetState() {
-        currentState = SignUpState.Initial
     }
 }

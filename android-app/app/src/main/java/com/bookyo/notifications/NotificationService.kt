@@ -1,9 +1,6 @@
 package com.bookyo.notifications
 
-import android.app.Application
 import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import com.amplifyframework.api.graphql.model.ModelPagination
 import com.amplifyframework.api.graphql.model.ModelQuery
 import com.amplifyframework.api.graphql.model.ModelSubscription
@@ -15,19 +12,17 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.supervisorScope
 import java.util.Timer
 import java.util.TimerTask
 
 /**
  * Service to manage notifications throughout the app
  */
-class NotificationService(private val application: Application) {
+class NotificationService() {
     companion object {
         private const val TAG = "NotificationService"
         private const val POLL_INTERVAL_MS = 60000L // 1 minute
@@ -36,9 +31,9 @@ class NotificationService(private val application: Application) {
         @Volatile
         private var INSTANCE: NotificationService? = null
 
-        fun getInstance(application: Application): NotificationService {
+        fun getInstance(): NotificationService {
             return INSTANCE ?: synchronized(this) {
-                val instance = NotificationService(application)
+                val instance = NotificationService()
                 INSTANCE = instance
                 instance
             }
@@ -97,15 +92,6 @@ class NotificationService(private val application: Application) {
         Log.d(TAG, "Stopping notification service")
         pollingTimer?.cancel()
         pollingTimer = null
-    }
-
-    /**
-     * Check for new notifications now
-     */
-    fun checkNow() {
-        serviceScope.launch {
-            fetchUnreadCount()
-        }
     }
 
     /**

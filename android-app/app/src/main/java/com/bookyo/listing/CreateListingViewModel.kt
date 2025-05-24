@@ -114,7 +114,7 @@ class CreateListingViewModel(application: Application) : AndroidViewModel(applic
             try {
                 // Load book details
                 val response = Amplify.API.query(
-                    ModelQuery.get(Book::class.java, bookId)
+                    ModelQuery[Book::class.java, bookId]
                 )
 
                 if (response.hasErrors()) {
@@ -348,7 +348,7 @@ class CreateListingViewModel(application: Application) : AndroidViewModel(applic
                 Log.d(TAG, "Creating listing for book: $bookId, user: $userEmail")
 
                 // Get the Book entity
-                val bookResponse = Amplify.API.query(ModelQuery.get(Book::class.java, bookId))
+                val bookResponse = Amplify.API.query(ModelQuery[Book::class.java, bookId])
                 if (bookResponse.hasErrors()) {
                     throw Exception("Failed to get book: ${bookResponse.errors.first().message}")
                 }
@@ -358,7 +358,7 @@ class CreateListingViewModel(application: Application) : AndroidViewModel(applic
                 }
 
                 // Get the User entity by email (User model uses email as identifier)
-                val userResponse = Amplify.API.query(ModelQuery.get(User::class.java, userEmail))
+                val userResponse = Amplify.API.query(ModelQuery[User::class.java, userEmail])
                 if (userResponse.hasErrors()) {
                     throw Exception("Failed to get user: ${userResponse.errors.first().message}")
                 }
@@ -470,7 +470,7 @@ class CreateListingViewModel(application: Application) : AndroidViewModel(applic
     private suspend fun createListingNotification(bookId: String, price: Double) {
         try {
             // Get book details for the notification
-            val bookResponse = Amplify.API.query(ModelQuery.get(Book::class.java, bookId))
+            val bookResponse = Amplify.API.query(ModelQuery[Book::class.java, bookId])
 
             if (bookResponse.hasErrors()) {
                 Log.e(TAG, "Error fetching book for notification: ${bookResponse.errors.first().message}")

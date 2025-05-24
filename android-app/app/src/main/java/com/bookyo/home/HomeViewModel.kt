@@ -5,14 +5,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.amplifyframework.api.graphql.model.ModelPagination
 import com.amplifyframework.api.graphql.model.ModelQuery
-import com.amplifyframework.core.model.LoadedModelReference
 import com.amplifyframework.datastore.generated.model.Book
-import com.amplifyframework.datastore.generated.model.Listing
 import com.amplifyframework.kotlin.core.Amplify
 import com.bookyo.analytics.BookyoAnalytics
-import com.bookyo.searchFeed.AuthorUIModel
-import com.bookyo.searchFeed.BookUIModel
-import com.bookyo.searchFeed.SearchScreenUIState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

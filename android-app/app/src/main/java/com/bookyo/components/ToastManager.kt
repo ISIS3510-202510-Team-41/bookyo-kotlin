@@ -22,7 +22,6 @@ class ToastState {
     fun showError(msg: String) = show(msg, ToastType.ERROR)
     fun showSuccess(msg: String) = show(msg, ToastType.SUCCESS)
     fun showInfo(msg: String) = show(msg, ToastType.INFO)
-    fun showWarning(msg: String) = show(msg, ToastType.WARNING)
 
     fun hide() {
         visible.value = false

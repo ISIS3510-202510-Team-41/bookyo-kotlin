@@ -8,12 +8,10 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import java.io.File
 import java.io.FileOutputStream
@@ -102,25 +100,6 @@ class PendingListingRepository(private val context: Context) {
     }
 
     /**
-     * Get a flow of pending listing requests
-     */
-    fun getPendingListingsFlow(): Flow<List<PendingListingData>> {
-        return context.pendingListingDataStore.data.map { preferences ->
-            try {
-                val pendingListingJson = preferences[PENDING_LISTING_KEY] ?: return@map emptyList()
-                Json.decodeFromString<List<PendingListingData>>(pendingListingJson)
-                    .sortedByDescending { it.timestamp }
-                    .filter { listing ->
-                        listing.imagePaths.all { imagePath -> File(imagePath).exists() }
-                    }
-            } catch (e: Exception) {
-                Log.e(TAG, "Error observing pending listings", e)
-                emptyList()
-            }
-        }
-    }
-
-    /**
      * Get a specific pending listing by ID
      */
     suspend fun getPendingListingById(id: String): PendingListingData? {
@@ -148,23 +127,6 @@ class PendingListingRepository(private val context: Context) {
 
             Log.d(TAG, "Removed pending listing with ID: $id")
         }
-    }
-
-    /**
-     * Remove all pending listing requests
-     */
-    suspend fun clearAllPendingListings() {
-        // Delete all saved images
-        getPendingListings().forEach { pendingListing ->
-            pendingListing.imagePaths.forEach { File(it).delete() }
-        }
-
-        // Clear the preferences
-        context.pendingListingDataStore.edit { preferences ->
-            preferences[PENDING_LISTING_KEY] = Json.encodeToString(emptyList<PendingListingData>())
-        }
-
-        Log.d(TAG, "Cleared all pending listings")
     }
 
     /**

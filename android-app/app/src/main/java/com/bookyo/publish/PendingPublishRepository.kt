@@ -11,9 +11,8 @@ import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import java.io.File
 import java.io.FileOutputStream
@@ -147,23 +146,6 @@ class PendingPublishRepository(private val context: Context) {
 
             Log.d(TAG, "Removed pending publish with ID: $id")
         }
-    }
-
-    /**
-     * Remove all pending publish requests
-     */
-    suspend fun clearAllPendingPublishes() {
-        // Delete all saved images
-        getPendingPublishes().forEach { pendingPublish ->
-            pendingPublish.imagePath?.let { File(it).delete() }
-        }
-
-        // Clear the preferences
-        context.pendingPublishDataStore.edit { preferences ->
-            preferences[PENDING_PUBLISH_KEY] = Json.encodeToString(emptyList<PendingPublishData>())
-        }
-
-        Log.d(TAG, "Cleared all pending publishes")
     }
 
     /**

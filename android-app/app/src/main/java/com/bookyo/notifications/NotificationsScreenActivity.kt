@@ -1,6 +1,5 @@
 package com.bookyo.notifications
 
-import android.content.res.Configuration
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -40,7 +39,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -49,7 +47,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.amplifyframework.datastore.generated.model.Notification
 import com.bookyo.R
@@ -76,8 +73,7 @@ class NotificationsScreenActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     NotificationsScreen(
-                        viewModel = viewModel,
-                        onNavigateBack = { finish() }
+                        viewModel = viewModel
                     )
                 }
             }
@@ -88,8 +84,7 @@ class NotificationsScreenActivity : ComponentActivity() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NotificationsScreen(
-    viewModel: NotificationsViewModel,
-    onNavigateBack: () -> Unit = {}
+    viewModel: NotificationsViewModel
 ) {
     val toastState = rememberToastState()
     val notifications by viewModel.notifications.collectAsState()
