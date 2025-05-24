@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.amplifyframework.datastore.generated.model.Book
 import com.bookyo.searchFeed.AuthorUIModel
 import com.bookyo.searchFeed.BookUIModel
 import com.bookyo.searchFeed.ListingUIModel
@@ -77,14 +78,14 @@ fun BookCard(
 
                     Spacer(modifier = Modifier.height(4.dp))
 
-                    // Author name
+                    /* Author name
                     Text(
                         text = "by ${book.author.name}",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
-                    )
+                    )*/
 
                     Spacer(modifier = Modifier.height(4.dp))
 

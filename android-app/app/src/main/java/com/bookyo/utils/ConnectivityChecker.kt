@@ -5,6 +5,8 @@ import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
 import android.net.NetworkRequest
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.core.content.getSystemService
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -87,4 +89,9 @@ class ConnectivityChecker(private val context: Context) {
             }
         }
     }.distinctUntilChanged()
+}
+
+@Composable
+fun rememberConnectivityChecker(context: Context): ConnectivityChecker {
+    return remember { ConnectivityChecker(context) }
 }
