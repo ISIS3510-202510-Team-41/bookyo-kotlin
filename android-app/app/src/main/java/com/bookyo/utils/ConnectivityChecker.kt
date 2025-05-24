@@ -69,15 +69,22 @@ class ConnectivityChecker(private val context: Context) {
             }
         }
 
-        // Register the callback
-        val request = NetworkRequest.Builder()
-            .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
-            .build()
-        connectivityManager.registerNetworkCallback(request, networkCallback)
+        try {
+            // Use registerDefaultNetworkCallback instead of registerNetworkCallback
+            // This doesn't require CHANGE_NETWORK_STATE permission
+            connectivityManager.registerDefaultNetworkCallback(networkCallback)
+        } catch (e: Exception) {
+            // Fallback to just returning the current state
+            trySend(isConnected())
+        }
 
         // Cleanup when Flow collector is cancelled
         awaitClose {
-            connectivityManager.unregisterNetworkCallback(networkCallback)
+            try {
+                connectivityManager.unregisterNetworkCallback(networkCallback)
+            } catch (e: Exception) {
+                // Ignore unregister errors
+            }
         }
     }.distinctUntilChanged()
 }

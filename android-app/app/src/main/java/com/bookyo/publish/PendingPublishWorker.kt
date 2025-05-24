@@ -38,15 +38,14 @@ class PendingPublishWorker(
 
             val workRequest = OneTimeWorkRequestBuilder<PendingPublishWorker>()
                 .setConstraints(constraints)
+                .setInitialDelay(5, java.util.concurrent.TimeUnit.SECONDS) // Add initial delay
                 .build()
 
             WorkManager.getInstance(context).enqueueUniqueWork(
                 UNIQUE_WORK_NAME,
-                ExistingWorkPolicy.REPLACE,
+                ExistingWorkPolicy.KEEP, // Changed from REPLACE to KEEP to avoid re-enqueueing
                 workRequest
             )
-
-            Log.d(TAG, "Enqueued work to process pending publishes")
         }
 
         /**

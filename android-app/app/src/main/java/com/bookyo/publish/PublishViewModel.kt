@@ -71,14 +71,22 @@ class PublishViewModel(application: Application) : AndroidViewModel(application)
     init {
         // Observe connectivity changes
         viewModelScope.launch {
+            var wasDisconnected = false
             connectivityChecker.observeConnectivity().collect { isConnected ->
                 _uiState.value = _uiState.value.copy(isConnected = isConnected)
 
-                // If connectivity is restored, try to process pending publishes
-                if (isConnected) {
-                    Log.d(TAG, "Connectivity restored, scheduling pending publishes")
-                    PendingPublishWorker.enqueueWork(getApplication())
+                // Only enqueue work if we transitioned from disconnected to connected
+                // AND we have pending publishes
+                if (isConnected && wasDisconnected) {
+                    viewModelScope.launch {
+                        val pendingCount = pendingPublishRepository.getPendingPublishes().size
+                        if (pendingCount > 0) {
+                            Log.d(TAG, "Connectivity restored with $pendingCount pending publishes")
+                            PendingPublishWorker.enqueueWork(getApplication())
+                        }
+                    }
                 }
+                wasDisconnected = !isConnected
             }
         }
 
@@ -123,8 +131,9 @@ class PublishViewModel(application: Application) : AndroidViewModel(application)
                 isLoading = true
             )
 
-            // Check for internet connectivity
+            // Check for internet connectivity FIRST
             if (!connectivityChecker.isConnected()) {
+                // Don't try any network operations when offline
                 handleOfflinePublish()
                 return@launch
             }
@@ -138,6 +147,8 @@ class PublishViewModel(application: Application) : AndroidViewModel(application)
                         publishState = PublishState.SUCCESS,
                         successMessage = "Book published successfully!"
                     )
+                    // Reset form after successful publish
+                    resetState()
                 } else {
                     _uiState.value = _uiState.value.copy(
                         isLoading = false,
@@ -147,11 +158,19 @@ class PublishViewModel(application: Application) : AndroidViewModel(application)
                 }
             } catch (e: Exception) {
                 Log.e(TAG, "Error publishing book", e)
-                _uiState.value = _uiState.value.copy(
-                    isLoading = false,
-                    publishState = PublishState.ERROR,
-                    errorMessage = "Error: ${e.message}"
-                )
+
+                // Check if it's a network error and handle offline
+                if (e.message?.contains("UnknownHost") == true ||
+                    e.message?.contains("Unable to resolve host") == true ||
+                    e.message?.contains("Network") == true) {
+                    handleOfflinePublish()
+                } else {
+                    _uiState.value = _uiState.value.copy(
+                        isLoading = false,
+                        publishState = PublishState.ERROR,
+                        errorMessage = "Error: ${e.message}"
+                    )
+                }
             }
         }
     }
@@ -202,6 +221,12 @@ class PublishViewModel(application: Application) : AndroidViewModel(application)
      */
     suspend fun publishBookSync(): Boolean {
         return withContext(Dispatchers.IO) {
+            // Double-check connectivity before attempting network operations
+            if (!connectivityChecker.isConnected()) {
+                Log.w(TAG, "No connectivity available for publishBookSync")
+                return@withContext false
+            }
+
             val start = System.currentTimeMillis()
             Log.d(TAG, "Starting image upload")
 
