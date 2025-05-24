@@ -21,6 +21,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.core.content.ContextCompat.startActivity
 
 class SearchScreenActivity: ComponentActivity() {
 
@@ -177,7 +178,7 @@ fun SearchScreen(viewModel: SearchScreenViewModel) {
                                             book = book,
                                             listing = listing,
                                             onClick = {
-                                                toastState.showInfo("Book details not implemented yet")
+                                                startActivity(BookDetailActivity.createIntent(context, book.id))
                                             }
                                         )
                                     }
@@ -188,7 +189,7 @@ fun SearchScreen(viewModel: SearchScreenViewModel) {
                                     BookCard(
                                         book = book,
                                         onClick = {
-                                            toastState.showInfo("Book details not implemented yet")
+                                            startActivity(BookDetailActivity.createIntent(context, book.id))
                                         }
                                     )
                                 }

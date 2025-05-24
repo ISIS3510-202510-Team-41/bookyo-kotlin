@@ -33,10 +33,10 @@ public final class BookLibrary implements Model {
   public static final BookLibraryPath rootPath = new BookLibraryPath("root", false, null);
   public static final QueryField ID = field("BookLibrary", "id");
   public static final QueryField BOOK = field("BookLibrary", "bookId");
-  public static final QueryField LIBRARY = field("BookLibrary", "libraryId");
+  public static final QueryField USER_LIBRARY_REF = field("BookLibrary", "libraryId");
   private final @ModelField(targetType="ID", isRequired = true) String id;
   private final @ModelField(targetType="Book") @BelongsTo(targetName = "bookId", targetNames = {"bookId"}, type = Book.class) ModelReference<Book> book;
-  private final @ModelField(targetType="UserLibrary") @BelongsTo(targetName = "libraryId", targetNames = {"libraryId"}, type = UserLibrary.class) ModelReference<UserLibrary> library;
+  private final @ModelField(targetType="UserLibrary") @BelongsTo(targetName = "libraryId", targetNames = {"libraryId"}, type = UserLibrary.class) ModelReference<UserLibrary> userLibraryRef;
   private @ModelField(targetType="AWSDateTime", isReadOnly = true) Temporal.DateTime createdAt;
   private @ModelField(targetType="AWSDateTime", isReadOnly = true) Temporal.DateTime updatedAt;
   /** @deprecated This API is internal to Amplify and should not be used. */
@@ -53,8 +53,8 @@ public final class BookLibrary implements Model {
       return book;
   }
   
-  public ModelReference<UserLibrary> getLibrary() {
-      return library;
+  public ModelReference<UserLibrary> getUserLibraryRef() {
+      return userLibraryRef;
   }
   
   public Temporal.DateTime getCreatedAt() {
@@ -65,10 +65,10 @@ public final class BookLibrary implements Model {
       return updatedAt;
   }
   
-  private BookLibrary(String id, ModelReference<Book> book, ModelReference<UserLibrary> library) {
+  private BookLibrary(String id, ModelReference<Book> book, ModelReference<UserLibrary> userLibraryRef) {
     this.id = id;
     this.book = book;
-    this.library = library;
+    this.userLibraryRef = userLibraryRef;
   }
   
   @Override
@@ -81,7 +81,7 @@ public final class BookLibrary implements Model {
       BookLibrary bookLibrary = (BookLibrary) obj;
       return ObjectsCompat.equals(getId(), bookLibrary.getId()) &&
               ObjectsCompat.equals(getBook(), bookLibrary.getBook()) &&
-              ObjectsCompat.equals(getLibrary(), bookLibrary.getLibrary()) &&
+              ObjectsCompat.equals(getUserLibraryRef(), bookLibrary.getUserLibraryRef()) &&
               ObjectsCompat.equals(getCreatedAt(), bookLibrary.getCreatedAt()) &&
               ObjectsCompat.equals(getUpdatedAt(), bookLibrary.getUpdatedAt());
       }
@@ -92,7 +92,7 @@ public final class BookLibrary implements Model {
     return new StringBuilder()
       .append(getId())
       .append(getBook())
-      .append(getLibrary())
+      .append(getUserLibraryRef())
       .append(getCreatedAt())
       .append(getUpdatedAt())
       .toString()
@@ -105,7 +105,7 @@ public final class BookLibrary implements Model {
       .append("BookLibrary {")
       .append("id=" + String.valueOf(getId()) + ", ")
       .append("book=" + String.valueOf(getBook()) + ", ")
-      .append("library=" + String.valueOf(getLibrary()) + ", ")
+      .append("userLibraryRef=" + String.valueOf(getUserLibraryRef()) + ", ")
       .append("createdAt=" + String.valueOf(getCreatedAt()) + ", ")
       .append("updatedAt=" + String.valueOf(getUpdatedAt()))
       .append("}")
@@ -135,28 +135,28 @@ public final class BookLibrary implements Model {
   public CopyOfBuilder copyOfBuilder() {
     return new CopyOfBuilder(id,
       book,
-      library);
+      userLibraryRef);
   }
   public interface BuildStep {
     BookLibrary build();
     BuildStep id(String id);
     BuildStep book(Book book);
-    BuildStep library(UserLibrary library);
+    BuildStep userLibraryRef(UserLibrary userLibraryRef);
   }
   
 
   public static class Builder implements BuildStep {
     private String id;
     private ModelReference<Book> book;
-    private ModelReference<UserLibrary> library;
+    private ModelReference<UserLibrary> userLibraryRef;
     public Builder() {
       
     }
     
-    private Builder(String id, ModelReference<Book> book, ModelReference<UserLibrary> library) {
+    private Builder(String id, ModelReference<Book> book, ModelReference<UserLibrary> userLibraryRef) {
       this.id = id;
       this.book = book;
-      this.library = library;
+      this.userLibraryRef = userLibraryRef;
     }
     
     @Override
@@ -166,7 +166,7 @@ public final class BookLibrary implements Model {
         return new BookLibrary(
           id,
           book,
-          library);
+          userLibraryRef);
     }
     
     @Override
@@ -176,8 +176,8 @@ public final class BookLibrary implements Model {
     }
     
     @Override
-     public BuildStep library(UserLibrary library) {
-        this.library = new LoadedModelReferenceImpl<>(library);
+     public BuildStep userLibraryRef(UserLibrary userLibraryRef) {
+        this.userLibraryRef = new LoadedModelReferenceImpl<>(userLibraryRef);
         return this;
     }
     
@@ -193,8 +193,8 @@ public final class BookLibrary implements Model {
   
 
   public final class CopyOfBuilder extends Builder {
-    private CopyOfBuilder(String id, ModelReference<Book> book, ModelReference<UserLibrary> library) {
-      super(id, book, library);
+    private CopyOfBuilder(String id, ModelReference<Book> book, ModelReference<UserLibrary> userLibraryRef) {
+      super(id, book, userLibraryRef);
       
     }
     
@@ -204,8 +204,8 @@ public final class BookLibrary implements Model {
     }
     
     @Override
-     public CopyOfBuilder library(UserLibrary library) {
-      return (CopyOfBuilder) super.library(library);
+     public CopyOfBuilder userLibraryRef(UserLibrary userLibraryRef) {
+      return (CopyOfBuilder) super.userLibraryRef(userLibraryRef);
     }
   }
   

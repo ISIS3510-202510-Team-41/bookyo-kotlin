@@ -94,6 +94,24 @@
             android:label="Search"
             />
 
+        <!-- Book Detail Activity -->
+        <activity
+            android:name="com.bookyo.bookDetail.BookDetailActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Bookyo"
+            android:windowSoftInputMode="adjustResize"
+            android:label="Book Details"
+            />
+
+        <!-- Create Listing Activity -->
+        <activity
+            android:name="com.bookyo.listing.CreateListingActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Bookyo"
+            android:windowSoftInputMode="adjustResize"
+            android:label="Create Listing"
+            />
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.fileprovider"

@@ -1,4 +1,4 @@
-package com.bookyo.components
+package com.bookyo.searchFeed
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -12,6 +12,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.amplifyframework.datastore.generated.model.Book
+import com.bookyo.components.BookThumbnail
 import com.bookyo.searchFeed.AuthorUIModel
 import com.bookyo.searchFeed.BookUIModel
 import com.bookyo.searchFeed.ListingUIModel
