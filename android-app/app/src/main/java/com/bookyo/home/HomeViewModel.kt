@@ -50,5 +50,4 @@ class HomeViewModel() : ViewModel() {
             emptyList()
         }
     }
-
 }

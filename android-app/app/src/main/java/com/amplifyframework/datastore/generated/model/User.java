@@ -44,7 +44,7 @@ public final class User implements Model {
   private final @ModelField(targetType="String") String lastName;
   private final @ModelField(targetType="String") String address;
   private final @ModelField(targetType="String") String phone;
-  private final @ModelField(targetType="UserLibrary") @HasOne(associatedWith = "user", type = UserLibrary.class) ModelReference<UserLibrary> library = null;
+  private final @ModelField(targetType="UserLibrary") @HasOne(associatedWith = "user", type = UserLibrary.class) ModelReference<UserLibrary> userLibraryRef = null;
   private final @ModelField(targetType="UserRating") @HasMany(associatedWith = "ratedUser", type = UserRating.class) ModelList<UserRating> ratingsReceived = null;
   private final @ModelField(targetType="UserRating") @HasMany(associatedWith = "user", type = UserRating.class) ModelList<UserRating> ratings = null;
   private final @ModelField(targetType="Listing") @HasMany(associatedWith = "user", type = Listing.class) ModelList<Listing> listings = null;
@@ -78,8 +78,8 @@ public final class User implements Model {
       return phone;
   }
   
-  public ModelReference<UserLibrary> getLibrary() {
-      return library;
+  public ModelReference<UserLibrary> getUserLibraryRef() {
+      return userLibraryRef;
   }
   
   public ModelList<UserRating> getRatingsReceived() {

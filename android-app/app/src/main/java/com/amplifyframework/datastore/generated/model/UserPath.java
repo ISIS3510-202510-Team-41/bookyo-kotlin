@@ -8,7 +8,7 @@ import com.amplifyframework.core.model.PropertyPath;
 
 /** This is an auto generated class representing the ModelPath for the User type in your schema. */
 public final class UserPath extends ModelPath<User> {
-  private UserLibraryPath library;
+  private UserLibraryPath userLibraryRef;
   private UserRatingPath ratingsReceived;
   private UserRatingPath ratings;
   private ListingPath listings;
@@ -18,11 +18,11 @@ public final class UserPath extends ModelPath<User> {
     super(name, isCollection, parent, User.class);
   }
   
-  public synchronized UserLibraryPath getLibrary() {
-    if (library == null) {
-      library = new UserLibraryPath("library", false, this);
+  public synchronized UserLibraryPath getUserLibraryRef() {
+    if (userLibraryRef == null) {
+      userLibraryRef = new UserLibraryPath("userLibraryRef", false, this);
     }
-    return library;
+    return userLibraryRef;
   }
   
   public synchronized UserRatingPath getRatingsReceived() {

@@ -38,7 +38,7 @@ public final class UserLibrary implements Model {
   public static final QueryField USER = field("UserLibrary", "userId");
   private final @ModelField(targetType="ID", isRequired = true) String id;
   private final @ModelField(targetType="User") @BelongsTo(targetName = "userId", targetNames = {"userId"}, type = User.class) ModelReference<User> user;
-  private final @ModelField(targetType="BookLibrary") @HasMany(associatedWith = "library", type = BookLibrary.class) ModelList<BookLibrary> books = null;
+  private final @ModelField(targetType="BookLibrary") @HasMany(associatedWith = "userLibraryRef", type = BookLibrary.class) ModelList<BookLibrary> books = null;
   private @ModelField(targetType="AWSDateTime", isReadOnly = true) Temporal.DateTime createdAt;
   private @ModelField(targetType="AWSDateTime", isReadOnly = true) Temporal.DateTime updatedAt;
   /** @deprecated This API is internal to Amplify and should not be used. */

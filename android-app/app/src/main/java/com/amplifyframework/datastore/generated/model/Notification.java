@@ -23,7 +23,7 @@ import static com.amplifyframework.core.model.query.predicate.QueryField.field;
 /** This is an auto generated class representing the Notification type in your schema. */
 @SuppressWarnings("all")
 @ModelConfig(pluralName = "Notifications", type = Model.Type.USER, version = 1, authRules = {
-  @AuthRule(allow = AuthStrategy.PRIVATE, operations = { ModelOperation.READ, ModelOperation.DELETE })
+  @AuthRule(allow = AuthStrategy.PRIVATE, operations = { ModelOperation.READ, ModelOperation.CREATE, ModelOperation.DELETE })
 }, hasLazySupport = true)
 @Index(name = "undefined", fields = {"id"})
 public final class Notification implements Model {

@@ -4,5 +4,6 @@ package com.amplifyframework.datastore.generated.model;
 public enum NotificationType {
   NEW_BOOK,
   BOOK_SOLD,
-  SYSTEM_NOTIFICATION
+  SYSTEM_NOTIFICATION,
+  NEW_LISTING
 }
