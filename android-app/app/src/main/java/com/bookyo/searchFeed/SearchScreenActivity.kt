@@ -11,7 +11,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.bookyo.R
-import com.bookyo.components.BookCard
 import com.bookyo.components.BottomNavigationBar
 import com.bookyo.components.Navigation
 import com.bookyo.components.ToastHandler
@@ -21,7 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.core.content.ContextCompat.startActivity
+import com.bookyo.bookDetail.BookDetailActivity
 
 class SearchScreenActivity: ComponentActivity() {
 
@@ -43,6 +42,7 @@ fun SearchScreen(viewModel: SearchScreenViewModel) {
     val toastState = rememberToastState()
     val currentScreenIndex = Navigation.getSelectedIndexForActivity(SearchScreenActivity::class.java)
     val uiState by viewModel.uiState.collectAsState()
+    val context = androidx.compose.ui.platform.LocalContext.current
 
     var selectedTabIndex by remember { mutableStateOf(0) }
     val tabTitles = listOf("Listings", "Books")
@@ -178,7 +178,9 @@ fun SearchScreen(viewModel: SearchScreenViewModel) {
                                             book = book,
                                             listing = listing,
                                             onClick = {
-                                                startActivity(BookDetailActivity.createIntent(context, book.id))
+                                                context.startActivity(
+                                                    BookDetailActivity.createIntent(context, book.id)
+                                                )
                                             }
                                         )
                                     }
@@ -189,7 +191,9 @@ fun SearchScreen(viewModel: SearchScreenViewModel) {
                                     BookCard(
                                         book = book,
                                         onClick = {
-                                            startActivity(BookDetailActivity.createIntent(context, book.id))
+                                            context.startActivity(
+                                                BookDetailActivity.createIntent(context, book.id)
+                                            )
                                         }
                                     )
                                 }

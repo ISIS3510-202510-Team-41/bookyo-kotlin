@@ -14,15 +14,20 @@ import com.amplifyframework.datastore.generated.model.Listing
 import com.amplifyframework.datastore.generated.model.ListingStatus
 import com.amplifyframework.datastore.generated.model.Notification
 import com.amplifyframework.datastore.generated.model.NotificationType
+import com.amplifyframework.datastore.generated.model.User
 import com.amplifyframework.kotlin.core.Amplify
 import com.amplifyframework.storage.StoragePath
 import com.bookyo.analytics.BookyoAnalytics
 import com.bookyo.utils.ConnectivityChecker
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 import java.util.UUID
 
@@ -172,22 +177,6 @@ class CreateListingViewModel(application: Application) : AndroidViewModel(applic
     }
 
     /**
-     * Update the description
-     */
-    fun updateDescription(newDescription: String) {
-        _uiState.update { it.copy(description = newDescription) }
-    }
-
-    /**
-     * Update the condition value
-     */
-    fun updateCondition(newCondition: Int) {
-        if (newCondition in 1..5) {
-            _uiState.update { it.copy(condition = newCondition) }
-        }
-    }
-
-    /**
      * Add an image to the listing
      */
     fun addListingImage(uri: Uri, isFromCamera: Boolean = false) {
@@ -298,8 +287,6 @@ class CreateListingViewModel(application: Application) : AndroidViewModel(applic
             val pendingListingData = pendingListingRepository.savePendingListing(
                 bookId = _uiState.value.bookId,
                 price = _uiState.value.price.toDoubleOrNull() ?: 0.0,
-                condition = _uiState.value.condition,
-                description = _uiState.value.description,
                 images = _uiState.value.images
             )
 
@@ -338,76 +325,108 @@ class CreateListingViewModel(application: Application) : AndroidViewModel(applic
      * This method can be called from the PendingListingWorker
      */
     suspend fun createListingSync(): Boolean {
-        val bookId = _uiState.value.bookId
-        val price = _uiState.value.price.toDoubleOrNull() ?: 0.0
-        val condition = _uiState.value.condition
-        val description = _uiState.value.description
-        val images = _uiState.value.images
+        return withContext(Dispatchers.IO) {
+            // Get values from UI state
+            val currentState = _uiState.value
+            val bookId = currentState.bookId
+            val price = currentState.price.toDoubleOrNull() ?: 0.0
+            val images = currentState.images
 
-        if (bookId.isEmpty()) {
-            Log.e(TAG, "Missing required data: bookId=$bookId")
-            return false
-        }
-
-        val startTime = System.currentTimeMillis()
-
-        try {
-            // First get the current user ID
-            val authUser = Amplify.Auth.getCurrentUser()
-            val userId = authUser.userId
-
-            // Upload images first
-            val imageKeys = uploadListingImages(images)
-
-            // Create the listing
-            val listing = Listing.builder()
-                .bookId(bookId)
-                .userId(userId)
-                .price(price)
-                .status(ListingStatus.AVAILABLE)
-                .photos(imageKeys)
-                .description(description)
-                .condition(condition)
-                .build()
-
-            val result = Amplify.API.mutate(ModelMutation.create(listing))
-
-            if (result.hasErrors()) {
-                throw Exception(result.errors.first().message)
+            if (bookId.isEmpty()) {
+                Log.e(TAG, "Missing required data: bookId=$bookId")
+                return@withContext false
             }
 
-            Log.d(TAG, "Successfully created listing for book $bookId")
+            val startTime = System.currentTimeMillis()
 
-            // Create notification about the new listing
-            createListingNotification(bookId, price)
+            try {
+                // First get the current user
+                val authUserEmail = Amplify.Auth.fetchUserAttributes().first()
 
-            // Track API call success
-            BookyoAnalytics.trackApiCall(
-                endpoint = "createListing",
-                isSuccess = true,
-                durationMs = System.currentTimeMillis() - startTime
-            )
+                val userEmail = authUserEmail.value
 
-            return true
-        } catch (e: Exception) {
-            Log.e(TAG, "Error creating listing", e)
+                Log.d(TAG, "Creating listing for book: $bookId, user: $userEmail")
 
-            // Track API call failure
-            BookyoAnalytics.trackApiCall(
-                endpoint = "createListing",
-                isSuccess = false,
-                durationMs = System.currentTimeMillis() - startTime,
-                errorType = e.javaClass.simpleName,
-                errorMessage = e.message
-            )
+                // Get the Book entity
+                val bookResponse = Amplify.API.query(ModelQuery.get(Book::class.java, bookId))
+                if (bookResponse.hasErrors()) {
+                    throw Exception("Failed to get book: ${bookResponse.errors.first().message}")
+                }
+                val book = bookResponse.data
+                if (book == null) {
+                    throw Exception("Book not found with ID: $bookId")
+                }
 
-            throw e
+                // Get the User entity by email (User model uses email as identifier)
+            val userResponse = Amplify.API.query(ModelQuery.get(User::class.java, userEmail))
+                if (userResponse.hasErrors()) {
+                    throw Exception("Failed to get user: ${userResponse.errors.first().message}")
+                }
+                val user = userResponse.data
+                if (user == null) {
+                    throw Exception("User not found with email: $userEmail")
+                }
+
+                // Upload images first
+                val imageKeys = uploadListingImages(images)
+                if (imageKeys.isEmpty()) {
+                    throw Exception("Failed to upload images or no images provided")
+                }
+
+                Log.d(TAG, "Successfully uploaded ${imageKeys.size} images")
+
+                // Create the listing using the correct builder pattern
+                val listing = Listing.builder()
+                    .price(price)
+                    .photos(imageKeys)
+                    .book(book)
+                    .user(user)
+                    .status(ListingStatus.available)
+                    .build()
+
+                Log.d(TAG, "Attempting to create listing with price: $price, photos: ${imageKeys.size}")
+
+                val result = Amplify.API.mutate(ModelMutation.create(listing))
+
+                if (result.hasErrors()) {
+                    val errorMessage = result.errors.joinToString(", ") { it.message }
+                    throw Exception("GraphQL errors: $errorMessage")
+                }
+
+                Log.d(TAG, "Successfully created listing for book $bookId")
+
+                // Create notification about the new listing
+                createListingNotification(bookId, price)
+
+                // Track API call success
+                BookyoAnalytics.trackApiCall(
+                    endpoint = "createListing",
+                    isSuccess = true,
+                    durationMs = System.currentTimeMillis() - startTime
+                )
+
+                return@withContext true
+            } catch (e: Exception) {
+                Log.e(TAG, "Error creating listing", e)
+
+                // Track API call failure
+                BookyoAnalytics.trackApiCall(
+                    endpoint = "createListing",
+                    isSuccess = false,
+                    durationMs = System.currentTimeMillis() - startTime,
+                    errorType = e.javaClass.simpleName,
+                    errorMessage = e.message
+                )
+
+                throw e
+            }
         }
     }
 
     /**
      * Upload listing images to S3 storage
      */
+    @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
     private suspend fun uploadListingImages(images: List<Uri>): List<String> {
         val imageKeys = mutableListOf<String>()
 
