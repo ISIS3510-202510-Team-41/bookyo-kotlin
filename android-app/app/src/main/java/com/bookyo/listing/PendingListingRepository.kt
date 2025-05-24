@@ -33,8 +33,6 @@ data class PendingListingData(
     val id: String = UUID.randomUUID().toString(),
     val bookId: String,
     val price: Double,
-    val condition: Int,
-    val description: String = "",
     val imagePaths: List<String> = emptyList(),
     val timestamp: Long = System.currentTimeMillis()
 )
@@ -54,8 +52,6 @@ class PendingListingRepository(private val context: Context) {
     suspend fun savePendingListing(
         bookId: String,
         price: Double,
-        condition: Int,
-        description: String = "",
         images: List<Uri> = emptyList()
     ): PendingListingData {
         // First save the images locally if they exist
@@ -67,8 +63,6 @@ class PendingListingRepository(private val context: Context) {
         val pendingListing = PendingListingData(
             bookId = bookId,
             price = price,
-            condition = condition,
-            description = description,
             imagePaths = localImagePaths
         )
 

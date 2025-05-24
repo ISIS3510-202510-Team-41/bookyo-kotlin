@@ -32,12 +32,10 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import com.bookyo.R
 import com.bookyo.components.Navigation
 import com.bookyo.components.rememberToastState
 import com.amplifyframework.datastore.generated.model.Book
-import com.bookyo.components.BookCard
 import com.bookyo.components.BookThumbnail
 import com.bookyo.publish.PublishScreenActivity
 import com.bookyo.searchFeed.SearchScreenActivity

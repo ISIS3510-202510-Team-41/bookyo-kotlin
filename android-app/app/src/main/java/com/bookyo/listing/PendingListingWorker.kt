@@ -168,8 +168,6 @@ class PendingListingWorker(
 
             // Set the price and other details
             listingViewModel.updatePrice(pendingListing.price.toString())
-            listingViewModel.updateCondition(pendingListing.condition)
-            listingViewModel.updateDescription(pendingListing.description)
 
             // Create the listing
             val result = listingViewModel.createListingSync()
