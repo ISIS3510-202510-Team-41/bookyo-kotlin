@@ -126,8 +126,8 @@ class SearchScreenViewModel : ViewModel() {
             val request = ModelQuery.list<Listing, ListingPath>(
                 Listing::class.java,
                 ModelPagination.firstPage().withLimit(pageSize)
-            ) { listingsPath ->
-                includes(listingsPath.user, listingsPath.book)
+            ) { listingPath ->
+                includes(listingPath.user, listingPath.book)
             }
 
             return@supervisorScope fetchListings(request)
@@ -159,8 +159,6 @@ class SearchScreenViewModel : ViewModel() {
                 return@supervisorScope null
             }
 
-            // We don't handle pagination in this simplified version
-
             BookyoAnalytics.trackApiCall(
                 endpoint = "fetchListings",
                 isSuccess = true,
@@ -187,102 +185,56 @@ class SearchScreenViewModel : ViewModel() {
             return
         }
 
-        // Create a map of book IDs to whether they're listed
-        val bookUIModels = if (!listings.isNullOrEmpty()) {
-            // Extract book info from listings
-            val listedBooksModels = listings.mapNotNull { listing ->
-                try {
-                    listing.book?.let { book ->
-                        val loadedBook = (book as? LoadedModelReference)?.value
-                        val loadedAuthor = loadedBook?.author?.let { author ->
-                            (author as? LoadedModelReference)?.value
-                        }
-
-                        if (loadedBook != null && loadedAuthor != null) {
-                            BookUIModel(
-                                id = loadedBook.id,
-                                title = loadedBook.title,
-                                author = AuthorUIModel(
-                                    id = loadedAuthor.id,
-                                    name = loadedAuthor.name
-                                ),
-                                isbn = loadedBook.isbn,
-                                thumbnail = loadedBook.thumbnail,
-                                isListed = true
-                            )
-                        } else null
-                    }
-                } catch (e: Exception) {
-                    null
-                }
+        // Create a map of book IDs to their listings
+        val bookIdToListings = listings?.groupBy { listing ->
+            try {
+                val loadedBook = (listing.book as? LoadedModelReference)?.value
+                loadedBook?.id
+            } catch (e: Exception) {
+                null
             }
+        }?.filterKeys { it != null } ?: emptyMap()
 
-            // Also include non-listed books
-            val nonListedBookIds = listedBooksModels.map { it.id }.toSet()
-            val nonListedBooks = books.filter { !nonListedBookIds.contains(it.id) }.mapNotNull { book ->
-                try {
-                    book.author?.let { author ->
-                        val loadedAuthor = (author as? LoadedModelReference)?.value
-                        if (loadedAuthor != null) {
-                            BookUIModel(
-                                id = book.id,
-                                title = book.title,
-                                author = AuthorUIModel(
-                                    id = loadedAuthor.id,
-                                    name = loadedAuthor.name
-                                ),
-                                isbn = book.isbn,
-                                thumbnail = book.thumbnail,
-                                isListed = false
-                            )
-                        } else null
-                    }
-                } catch (e: Exception) {
-                    null
-                }
-            }
+        // Map books to UI models
+        val bookUIModels = books.mapNotNull { book ->
+            try {
+                book.author?.let { author ->
+                    val loadedAuthor = (author as? LoadedModelReference)?.value
+                    if (loadedAuthor != null) {
+                        // Check if this book has any listings
+                        val hasListings = bookIdToListings[book.id]?.isNotEmpty() == true
 
-            // Combine both lists
-            listedBooksModels + nonListedBooks
-        } else {
-            // Only process books if there are no listings
-            books.mapNotNull { book ->
-                try {
-                    book.author?.let { author ->
-                        val loadedAuthor = (author as? LoadedModelReference)?.value
-                        if (loadedAuthor != null) {
-                            BookUIModel(
-                                id = book.id,
-                                title = book.title,
-                                author = AuthorUIModel(
-                                    id = loadedAuthor.id,
-                                    name = loadedAuthor.name
-                                ),
-                                isbn = book.isbn,
-                                thumbnail = book.thumbnail,
-                                isListed = false
-                            )
-                        } else null
-                    }
-                } catch (e: Exception) {
-                    null
+                        BookUIModel(
+                            id = book.id,
+                            title = book.title,
+                            author = AuthorUIModel(
+                                id = loadedAuthor.id,
+                                name = loadedAuthor.name
+                            ),
+                            isbn = book.isbn,
+                            thumbnail = book.thumbnail,
+                            isListed = hasListings
+                        )
+                    } else null
                 }
+            } catch (e: Exception) {
+                null
             }
         }
 
-        // Extract listing information
+        // Map listings to UI models
         val listingUIModels = listings?.mapNotNull { listing ->
             try {
                 val loadedUser = listing.user?.let { user ->
                     (user as? LoadedModelReference)?.value
                 }
-                val bookId = listing.book?.let { book ->
-                    (book as? LoadedModelReference)?.value?.id
+                val loadedBook = listing.book?.let { book ->
+                    (book as? LoadedModelReference)?.value
                 }
 
-                if (loadedUser != null && bookId != null) {
+                if (loadedUser != null && loadedBook != null) {
                     ListingUIModel(
-                        id = bookId, // Use the book ID to match with BookUIModel
+                        id = loadedBook.id, // Use the book ID to match with BookUIModel
                         seller = loadedUser.email,
                         price = listing.price
                     )

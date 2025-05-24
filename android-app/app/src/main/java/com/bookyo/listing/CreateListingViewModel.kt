@@ -358,7 +358,7 @@ class CreateListingViewModel(application: Application) : AndroidViewModel(applic
                 }
 
                 // Get the User entity by email (User model uses email as identifier)
-            val userResponse = Amplify.API.query(ModelQuery.get(User::class.java, userEmail))
+                val userResponse = Amplify.API.query(ModelQuery.get(User::class.java, userEmail))
                 if (userResponse.hasErrors()) {
                     throw Exception("Failed to get user: ${userResponse.errors.first().message}")
                 }

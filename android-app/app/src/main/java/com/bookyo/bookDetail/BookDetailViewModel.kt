@@ -181,7 +181,7 @@ class BookDetailViewModel(application: Application) : AndroidViewModel(applicati
         try {
             val request = ModelQuery.list<Listing, ListingPath>(
                 Listing::class.java,
-                Listing.ID.eq(bookId)
+                Listing.BOOK.eq(bookId)
             ) { listingPath ->
                 includes(listingPath.user, listingPath.book)
             }
