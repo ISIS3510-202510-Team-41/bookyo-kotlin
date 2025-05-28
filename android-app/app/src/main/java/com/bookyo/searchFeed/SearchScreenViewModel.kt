@@ -14,11 +14,13 @@ import com.amplifyframework.datastore.generated.model.Listing
 import com.amplifyframework.datastore.generated.model.ListingPath
 import com.amplifyframework.kotlin.core.Amplify
 import com.bookyo.analytics.BookyoAnalytics
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.supervisorScope
+import kotlinx.coroutines.withContext
 import java.io.IOException
 
 class SearchScreenViewModel : ViewModel() {
@@ -60,7 +62,7 @@ class SearchScreenViewModel : ViewModel() {
         }
     }
 
-    private suspend fun fetchBooksPageOne(): List<Book>? = supervisorScope {
+    private suspend fun fetchBooksPageOne(): List<Book>? = withContext(Dispatchers.IO) {
         try {
             val request = ModelQuery.list<Book, BookPath>(
                 Book::class.java,
@@ -69,7 +71,7 @@ class SearchScreenViewModel : ViewModel() {
                 includes(bookPath.author)
             }
 
-            return@supervisorScope fetchBooks(request)
+            fetchBooks(request)
         } catch (e: Exception) {
             BookyoAnalytics.trackApiCall(
                 endpoint = "fetchBooksPageOne",
@@ -82,7 +84,7 @@ class SearchScreenViewModel : ViewModel() {
         }
     }
 
-    private suspend fun fetchBooks(request: GraphQLRequest<PaginatedResult<Book>>): List<Book>? = supervisorScope {
+    private suspend fun fetchBooks(request: GraphQLRequest<PaginatedResult<Book>>): List<Book>? = withContext(Dispatchers.IO) {
         try {
             val response = Amplify.API.query(request)
 
@@ -95,12 +97,8 @@ class SearchScreenViewModel : ViewModel() {
                     errorType = "NullDataResponse",
                     errorMessage = "API returned null data"
                 )
-                return@supervisorScope null
+                return@withContext null
             }
-
-            // We don't handle pagination in this simplified version
-            // but you can use response.data.hasNextResult() and
-            // response.data.requestForNextResult to implement it
 
             BookyoAnalytics.trackApiCall(
                 endpoint = "fetchBooks",
@@ -108,7 +106,7 @@ class SearchScreenViewModel : ViewModel() {
                 durationMs = 0L
             )
 
-            return@supervisorScope response.data.items.toList()
+            response.data.items.toList()
         } catch (e: Exception) {
             BookyoAnalytics.trackApiCall(
                 endpoint = "fetchBooks",
@@ -121,7 +119,8 @@ class SearchScreenViewModel : ViewModel() {
         }
     }
 
-    private suspend fun fetchListingsPageOne(): List<Listing>? = supervisorScope {
+
+    private suspend fun fetchListingsPageOne(): List<Listing>? = withContext(Dispatchers.IO) {
         try {
             val request = ModelQuery.list<Listing, ListingPath>(
                 Listing::class.java,
@@ -130,7 +129,7 @@ class SearchScreenViewModel : ViewModel() {
                 includes(listingPath.user, listingPath.book)
             }
 
-            return@supervisorScope fetchListings(request)
+            fetchListings(request)
         } catch (e: Exception) {
             BookyoAnalytics.trackApiCall(
                 endpoint = "fetchListingsPageOne",
@@ -143,11 +142,11 @@ class SearchScreenViewModel : ViewModel() {
         }
     }
 
-    private suspend fun fetchListings(request: GraphQLRequest<PaginatedResult<Listing>>): List<Listing>? = supervisorScope {
+
+    private suspend fun fetchListings(request: GraphQLRequest<PaginatedResult<Listing>>): List<Listing>? = withContext(Dispatchers.IO) {
         try {
             val response = Amplify.API.query(request)
 
-            // Null safety check for the response data
             if (response.data == null) {
                 BookyoAnalytics.trackApiCall(
                     endpoint = "fetchListings",
@@ -156,7 +155,7 @@ class SearchScreenViewModel : ViewModel() {
                     errorType = "NullDataResponse",
                     errorMessage = "API returned null data"
                 )
-                return@supervisorScope null
+                return@withContext null
             }
 
             BookyoAnalytics.trackApiCall(
@@ -165,7 +164,7 @@ class SearchScreenViewModel : ViewModel() {
                 durationMs = 0L
             )
 
-            return@supervisorScope response.data.items.toList()
+            response.data.items.toList()
         } catch (e: Exception) {
             BookyoAnalytics.trackApiCall(
                 endpoint = "fetchListings",
@@ -177,6 +176,7 @@ class SearchScreenViewModel : ViewModel() {
             null
         }
     }
+
 
     private fun mapBooksToUiModels(books: List<Book>?, listings: List<Listing>?) {
         // Check if we have valid book data

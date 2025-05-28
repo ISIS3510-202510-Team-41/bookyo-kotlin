@@ -12,6 +12,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.withContext
 import java.io.File
 
@@ -30,19 +31,17 @@ class ImageLoader(private val context: Context) {
             val file = download.result().file
 
             // Load bitmap with Glide
-            val bitmap = withContext(Dispatchers.IO) {
-                Glide.with(context)
+            val bitmap = Glide.with(context)
                     .asBitmap()
                     .load(file)
                     .submit()
                     .get()
-            }
 
             emit(ImageLoadingState.Success(bitmap))
         } catch (e: Exception) {
             emit(ImageLoadingState.Error(e))
         }
-    }
+    }.flowOn(Dispatchers.IO)
 
 sealed class ImageLoadingState {
     object Loading : ImageLoadingState()

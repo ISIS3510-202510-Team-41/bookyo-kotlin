@@ -11,11 +11,13 @@ import com.amplifyframework.auth.AuthUser
 import com.amplifyframework.datastore.generated.model.Notification
 import com.amplifyframework.kotlin.core.Amplify
 import com.bookyo.analytics.BookyoAnalytics
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.supervisorScope
+import kotlinx.coroutines.withContext
 
 class NotificationsViewModel(application: Application) : AndroidViewModel(application) {
     companion object {
@@ -66,7 +68,7 @@ class NotificationsViewModel(application: Application) : AndroidViewModel(applic
         }
     }
 
-    private suspend fun loadNotifications(): List<Notification> = supervisorScope {
+    private suspend fun loadNotifications(): List<Notification> = withContext(Dispatchers.IO) {
         val start = System.currentTimeMillis()
 
         try {
@@ -90,9 +92,7 @@ class NotificationsViewModel(application: Application) : AndroidViewModel(applic
                 null
             )
 
-            return@supervisorScope response.data.items.toList().sortedByDescending {
-                if (!it.read) 1 else 0
-            }
+            response.data.items.toList().sortedByDescending { !it.read }
         } catch (e: Exception) {
             val duration = System.currentTimeMillis() - start
             BookyoAnalytics.trackApiCall(
@@ -107,14 +107,18 @@ class NotificationsViewModel(application: Application) : AndroidViewModel(applic
         }
     }
 
+
     fun markAsRead(notification: Notification) {
         viewModelScope.launch {
             try {
-                val updatedNotification = notification.copyOfBuilder()
-                    .read(true)
-                    .build()
+                val updatedNotification = withContext(Dispatchers.IO) {
+                    val updated = notification.copyOfBuilder()
+                        .read(true)
+                        .build()
 
-                Amplify.API.mutate(ModelMutation.update(updatedNotification))
+                    Amplify.API.mutate(ModelMutation.update(updated))
+                    updated
+                }
 
                 val currentList = _notifications.value.toMutableList()
                 val index = currentList.indexOfFirst { it.id == notification.id }

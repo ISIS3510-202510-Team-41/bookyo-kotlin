@@ -17,12 +17,14 @@ import com.amplifyframework.datastore.generated.model.ListingPath
 import com.amplifyframework.datastore.generated.model.Wishlist
 import com.amplifyframework.kotlin.core.Amplify
 import com.bookyo.analytics.BookyoAnalytics
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.supervisorScope
+import kotlinx.coroutines.withContext
 
 data class BookDetailUIState(
     val isLoading: Boolean = true,
@@ -65,12 +67,14 @@ class BookDetailViewModel(application: Application) : AndroidViewModel(applicati
         try {
             val userId = currentUserId ?: return
 
-            val response = Amplify.API.query(
-                ModelQuery.list(
-                    Wishlist::class.java,
-                    Wishlist.ID.eq(userId)
+            val response = withContext(Dispatchers.IO) {
+                Amplify.API.query(
+                    ModelQuery.list(
+                        Wishlist::class.java,
+                        Wishlist.ID.eq(userId)
+                    )
                 )
-            )
+            }
 
             wishlistId = response.data.items.firstOrNull()?.id
             Log.d(TAG, "Loaded wishlist ID: $wishlistId")
@@ -86,23 +90,31 @@ class BookDetailViewModel(application: Application) : AndroidViewModel(applicati
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
 
             try {
-                // Load the book
-                val book = fetchBook(bookId)
+                // Variables para mantener resultados de IO
+                val book: Book?
+                var authorName = ""
+                var hasListing = false
+                var listingPrice = ""
+                var isInWishlist = false
 
+                withContext(Dispatchers.IO) {
+                    book = fetchBook(bookId)
+
+                    if (book != null) {
+                        authorName = (book.author as? LoadedModelReference<Author>)?.value?.name ?: ""
+
+                        val listings = fetchListings(bookId)
+                        hasListing = !listings.isNullOrEmpty()
+                        listingPrice = if (hasListing) {
+                            String.format("$%.2f", listings.first().price)
+                        } else ""
+
+                        isInWishlist = checkWishlist(bookId)
+                    }
+                }
+
+                // Actualización de la UI en el hilo principal
                 if (book != null) {
-                    // Get author name
-                    val authorName = (book.author as? LoadedModelReference<Author>)?.value?.name ?: ""
-
-                    // Check if there are any listings for this book
-                    val listings = fetchListings(bookId)
-                    val hasListing = !listings.isNullOrEmpty()
-                    val listingPrice = if (hasListing) {
-                        String.format("$%.2f", listings.first().price)
-                    } else ""
-
-                    // Check if the book is in the user's wishlist
-                    val isInWishlist = checkWishlist(bookId)
-
                     _uiState.update {
                         it.copy(
                             isLoading = false,
@@ -121,6 +133,7 @@ class BookDetailViewModel(application: Application) : AndroidViewModel(applicati
                         )
                     }
                 }
+
             } catch (e: Exception) {
                 Log.e(TAG, "Error loading book details", e)
                 _uiState.update {
@@ -133,7 +146,8 @@ class BookDetailViewModel(application: Application) : AndroidViewModel(applicati
         }
     }
 
-    private suspend fun fetchBook(bookId: String): Book? = supervisorScope {
+
+    private suspend fun fetchBook(bookId: String): Book? = withContext(Dispatchers.IO) {
         val start = System.currentTimeMillis()
 
         try {
@@ -175,7 +189,8 @@ class BookDetailViewModel(application: Application) : AndroidViewModel(applicati
         }
     }
 
-    private suspend fun fetchListings(bookId: String): List<Listing>? = supervisorScope {
+
+    private suspend fun fetchListings(bookId: String): List<Listing>? = withContext(Dispatchers.IO) {
         val start = System.currentTimeMillis()
 
         try {
@@ -217,8 +232,9 @@ class BookDetailViewModel(application: Application) : AndroidViewModel(applicati
         }
     }
 
-    private suspend fun checkWishlist(bookId: String): Boolean {
-        val wishlistId = this.wishlistId ?: return false
+
+    private suspend fun checkWishlist(bookId: String): Boolean = withContext(Dispatchers.IO) {
+        val wishlistId = this@BookDetailViewModel.wishlistId ?: return@withContext false
 
         try {
             val response = Amplify.API.query(
@@ -229,12 +245,13 @@ class BookDetailViewModel(application: Application) : AndroidViewModel(applicati
             )
 
             val res = response.data.items
-            return res.iterator().hasNext()
+            res.iterator().hasNext()
         } catch (e: Exception) {
             Log.e(TAG, "Error checking wishlist", e)
-            return false
+            false
         }
     }
+
 
     fun addToWishlist() {
         viewModelScope.launch {
